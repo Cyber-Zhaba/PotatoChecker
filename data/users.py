@@ -2,7 +2,7 @@ import sqlalchemy
 from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from db_session import SqlAlchemyBase
+from .db_session import SqlAlchemyBase
 
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):
@@ -10,7 +10,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
-    login = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    username = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String,
                               unique=True, nullable=True)
 
