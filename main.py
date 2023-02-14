@@ -12,7 +12,6 @@ from data.feedbacks import Feedbacks
 from data.sites import Sites
 from data.users import User
 from scriptes.availability_checker import availability_checker
-from templates import html
 
 from forms.registration_forms import RegisterForm, LoginForm
 
@@ -34,6 +33,16 @@ def main():
     app.run(host='0.0.0.0', port=port)
 
 
+@app.route('/')
+def index_page():
+    return render_template('Home.html')
+
+
+@app.route('/Home')
+def home_page():
+    return redirect("/")
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -48,18 +57,18 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/Register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         form = RegisterForm()
-        return render_template('signup.html', title='signup', form=form)
+        return render_template('Register.html', title='signup', form=form)
 
     elif request.method == 'POST':
         form = RegisterForm()
         if form.validate_on_submit():
             db_sess = db_session.create_session()
             if db_sess.query(User).filter(User.username == form.username.data).first():
-                return render_template('signup.html', form=form, message="Этот логин уже существует")
+                return render_template('Register.html', form=form, message="Этот логин уже существует")
             user = User(
                 username=form.username.data,
                 name=form.username.data,
@@ -70,7 +79,7 @@ def register():
             db_sess.commit()
             login_user(user, remember=form.remember_me.data)
             return redirect("/", 301)
-        return render_template('signup.html', form=form)
+        return render_template('Register.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -105,7 +114,6 @@ def personal_account():
             pass
             # send_mail(site, answer[0])
     return 0
-
 
 
 if __name__ == '__main__':

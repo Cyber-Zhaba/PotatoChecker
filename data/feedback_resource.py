@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse, abort
 from flask import jsonify
-import db_session
-from feedbacks import Feedbacks
+from data import db_session
+from data.feedbacks import Feedbacks
 
 
 def abort_feedback_not_found(index: int) -> None:
