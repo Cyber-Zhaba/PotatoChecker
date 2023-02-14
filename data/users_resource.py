@@ -4,7 +4,8 @@ from . import db_session
 from .users import User
 
 
-def abort_if_users_not_found(users_id):
+def abort_if_users_not_found(users_id: int) -> None:
+    """Returns 404 ERROR if id not found"""
     session = db_session.create_session()
     users = session.query(User).get(users_id)
     if not users:
@@ -12,13 +13,20 @@ def abort_if_users_not_found(users_id):
 
 
 class UsersResource(Resource):
-    def get(self, user_id):
+    def __init__(self) -> None:
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', required=True)
+        parser.add_argument('email', required=True)
+
+    @staticmethod
+    def get(user_id: int) -> dict:
         abort_if_users_not_found(user_id)
         session = db_session.create_session()
         users = session.query(User).get(user_id)
         return jsonify({'users': users.to_dict(rules=("-user", "-user"))})
 
-    def delete(self, user_id):
+    @staticmethod
+    def delete(user_id: int) -> dict:
         abort_if_users_not_found(user_id)
         session = db_session.create_session()
         users = session.query(User).get(user_id)
@@ -27,27 +35,28 @@ class UsersResource(Resource):
         return jsonify({'success': 'OK'})
 
 
-parser = reqparse.RequestParser()
-parser.add_argument('name', required=True)
-parser.add_argument('email', required=True)
-
-
 class UsersListResource(Resource):
-    def get(self):
+    def __init__(self) -> None:
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', required=True)
+        parser.add_argument('email', required=True)
+
+    @staticmethod
+    def get() -> dict:
         session = db_session.create_session()
         users = session.query(User).all()
         return jsonify({'users': [
             item.to_dict(rules=("-user", "-user")) for item in users
         ]})
 
-    def post(self):
-        args = parser.parse_args()
+    def post(self) -> dict:
+        args = self.parser.parse_args()
         session = db_session.create_session()
         users = User(
             name=args['name'],
             address=args['address'],
             email=args['email']
-            )
+        )
         session.add(users)
         session.commit()
         return jsonify({'success': 'OK'})
