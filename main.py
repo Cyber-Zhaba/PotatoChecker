@@ -58,10 +58,10 @@ def register():
         if form.validate_on_submit():
             db_sess = db_session.create_session()
             if db_sess.query(User).filter(User.username == form.username.data).first():
-                return make_response(render_template('signup.html', form=form, message="Этот логин уже существует"),
-                                     200)
+                return render_template('signup.html', form=form, message="Этот логин уже существует")
             user = User(
                 username=form.username.data,
+                name=form.username.data,
                 email=form.email.data
             )
             user.set_password(form.password.data)
