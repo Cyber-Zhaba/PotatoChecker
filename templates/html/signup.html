@@ -1,0 +1,50 @@
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div class="card signin">
+        <div class="mb-3">
+            {{ form.username.label }}
+            {{ form.username(class="form-control") }}
+            {% for error in form.username.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.name.label }}
+            {{ form.name(class="form-control") }}
+            {% for error in form.name.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.email.label }}
+            {{ form.email(class="form-control", type="email") }}
+            {% for error in form.email.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.password.label }}
+            {{ form.password(class="form-control", type="password") }}
+            {% for error in form.password.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            {{ form.remember_me() }} {{ form.remember_me.label }}
+        </div>
+        <div class="d-grid">
+            <button type="submit" id="submit" name="submit" value="Submit" class="btn btn-primary">Войти</button>
+        </div>
+        {% if message %}
+        <div class="d-grid alert alert-danger" role="alert">{{message}}</div>
+        {% endif %}
+    </div>
+</form>
