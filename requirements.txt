@@ -4,3 +4,7 @@ Flask~=2.2.2
 requests~=2.28.2
 python-telegram-bot~=20.1
 WTForms~=3.0.1
+flask_login~=0.6.2
+flask_restful~=0.3.9
+sqlalchemy_serializer~=1.4.1
+flask_wtf~=1.1.1
