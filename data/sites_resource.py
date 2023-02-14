@@ -19,7 +19,7 @@ class SitesResource(Resource):
         self.parser.add_argument('owner_id', required=True)
         self.parser.add_argument('link', required=True)
         self.parser.add_argument('description', required=True)
-        self.parser.add_argument('state', required=True)
+        self.parser.add_argument('ping', required=True)
         self.parser.add_argument('ids_feedback', required=True)
 
     @staticmethod
@@ -48,7 +48,7 @@ class ListSites(Resource):
         self.parser.add_argument('owner_id', required=True)
         self.parser.add_argument('link', required=True)
         self.parser.add_argument('description', required=True)
-        self.parser.add_argument('state', required=True)
+        self.parser.add_argument('ping', required=True)
         self.parser.add_argument('ids_feedback', required=True)
 
     @staticmethod
@@ -68,7 +68,7 @@ class ListSites(Resource):
             owner_id=args['owner_id'],
             link=args['link'],
             description=args['description'],
-            state=args['state'],
+            ping=args['ping'],
             ids_feedbacks=args['ids_feedbacks'],
         )
         session.add(sites)

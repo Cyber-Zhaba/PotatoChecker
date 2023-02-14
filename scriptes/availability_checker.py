@@ -1,32 +1,38 @@
-import time
-from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
+import asyncio
+import subprocess
+import chardet
+from data.sites import Sites
+from data import db_session
+
+websites = [[i, db_session.query(Sites).filter(Sites.id == i).link] for i in db_session.query(Sites)]
 
 
-def availability_checker(url):
-    req = Request(url)
-    answer = []
-    try:
-        flag = True
-        for counter in range(5):
-            response = urlopen(req)
-            if counter >= 3:
-                answer.append("The site is loading to slow")
-            if response:
-                answer.append("Website is working fine")
-                flag = False
-                break
-            time.sleep(7)
-        if flag:
-            answer.append("Couldn't load website")
-    except HTTPError as err:
-        answer.append('The server couldn\'t fulfill the request.')
-        answer.append(f'Error code: {err.code}')
-    except URLError as err:
-        answer.append('We failed to reach a server.')
-        answer.append(f'Reason: {err.reason}')
-    return answer
+async def ping_website(website):
+    ping_process = await asyncio.create_subprocess_exec(
+        "ping", "-n", "3", website,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await ping_process.communicate()
+    return website, ping_process.returncode, stdout, stderr
 
 
-if __name__ == '__main__':
-    print(availability_checker('https://aboba.io'))
+async def run_pings():
+    while True:
+        results = await asyncio.gather(*[ping_website(website[1]) for website in websites])
+        for result in results:
+            res_id = result[0][0]
+            site_ping = result[2]
+            result = chardet.detect(site_ping)
+            decoded = site_ping.decode(result['encoding'])
+            result_ping = decoded.split("\r\n")[-2].split(',')[-1].split(' = ')[-1].split()[0]
+            site = Sites(
+                id=res_id,
+                ping=result_ping
+            )
+            db_session.add(site)
+            db_session.commit()
+        await asyncio.sleep(120)  # ждем 2 минуты перед повторной проверкой
+
+
+asyncio.run(run_pings())
