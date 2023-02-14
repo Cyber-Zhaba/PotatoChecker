@@ -8,10 +8,9 @@ class Sites(SqlAlchemyBase, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True,
                            autoincrement=True)
-
     owner_id = sqlalchemy.Column(sqlalchemy.Integer,
                                  sqlalchemy.ForeignKey("users.id"))
-
+    name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     link = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     state = sqlalchemy.Column(sqlalchemy.String, nullable=True)

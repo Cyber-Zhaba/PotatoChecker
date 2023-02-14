@@ -1,5 +1,6 @@
 import os
 
+import matplotlib as plt
 from flask import make_response
 from flask import Flask, request
 from flask import render_template, redirect
@@ -121,19 +122,34 @@ def login():
 
 
 @login_required
-@app.route('/personal_account', methods=['GET', 'POST'])
-def personal_account():
-    db_sess = db_session.create_session()
-    for site_id in current_user.favourite_sites:
-        site = db_sess.query(Sites).filter(Sites.id == site_id).first()
+@app.route('/personal_account/<string:search>', methods=['GET'])
+def personal_account(search):
+    if request.method == 'GET':
+        db_sess = db_session.create_session()
+        favourite_sites_names = [db_sess.query(Sites).filter(Sites.id == i).name for i in db_sess.query(Sites).filter(
+            search in Sites.link and current_user.favourite_sites.containes(Sites.id))]
+        not_favourite_sites_names = [db_sess.query(Sites).filter(Sites.id == i).name for i in
+                                     db_sess.query(Sites).filter(
+                                         search in Sites.link and Sites.id not in current_user.favourite_sites)]
+        return render_template('''<table>
+                                    <tr>
+                                        {% for favourite_website in favourite_sites_names %}
+                                            <a class="btn btn-info" href="/draw_graphic/{{favourite_website}}">{{favourite_website}}</a>
+                                        { % endfor %}
+                                        {% for not_favourite_website in not_favourite_sites_names %}
+                                            <a class="btn btn-info" href="/draw_graphic/{{not_favourite_website}}">{{not_favourite_website}}</a>
+                                        { % endfor %}
+                                    </tr> 
+                                    </table>'''
+                               ,
+                               favourite_sites=favourite_sites_names,
+                               not_favourite_sites_names=not_favourite_sites_names)
 
-        answer = availability_checker(site.url)
 
-        site.state = answer[0]
-        if answer[0] != "Website is working fine":
-            pass
-            # send_mail(site, answer[0])
-    return 0
+@app.route('/draw_graphic/<int:website_id>', methods=['GET'])
+def draw_graphic(website_id):
+    print(1)
+    return redirect('/personal_account')
 
 
 if __name__ == '__main__':
