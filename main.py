@@ -11,6 +11,7 @@ from data import db_session, feedback_resource, sites_resource, users_resource
 from data.feedbacks import Feedbacks
 from data.sites import Sites
 from data.users import User
+from scriptes.availability_checker import availability_checker
 from templates import html
 
 from forms.registration_forms import RegisterForm, LoginForm
@@ -88,6 +89,23 @@ def login():
                 return redirect("/", 301)
             return render_template('signin.html', message="Неправильный логин или пароль", form=form)
         return render_template('signin.html', form=form)
+
+
+@login_required
+@app.route('/personal_account', methods=['GET', 'POST'])
+def personal_account():
+    db_sess = db_session.create_session()
+    for site_id in current_user.favourite_sites:
+        site = db_sess.query(Sites).filter(Sites.id == site_id).first()
+
+        answer = availability_checker(site.url)
+
+        site.state = answer[0]
+        if answer[0] != "Website is working fine":
+            pass
+            # send_mail(site, answer[0])
+    return 0
+
 
 
 if __name__ == '__main__':
