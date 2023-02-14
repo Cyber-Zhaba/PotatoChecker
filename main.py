@@ -33,14 +33,34 @@ def main():
     app.run(host='0.0.0.0', port=port)
 
 
+@app.route('/About.html')
+def about():
+    return redirect("/about")
+
+
+@app.route('/Home.html')
+def home():
+    return redirect("/")
+
+
+@app.route('/Personal-account.html')
+def personal():
+    return redirect("/account")
+
+
 @app.route('/')
-def index_page():
+def home_page():
     return render_template('Home.html')
 
 
-@app.route('/Home')
-def home_page():
-    return redirect("/")
+@app.route('/about')
+def about_page():
+    return render_template('About.html')
+
+
+@app.route('/account')
+def account_page():
+    return render_template('Personal-account.html')
 
 
 @app.route('/logout')
@@ -57,7 +77,7 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-@app.route('/Register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         form = RegisterForm()
@@ -86,7 +106,7 @@ def register():
 def login():
     if request.method == 'GET':
         form = LoginForm()
-        return render_template('signin.html', form=form)
+        return render_template('Login.html', form=form)
 
     elif request.method == 'POST':
         form = LoginForm()
@@ -96,8 +116,8 @@ def login():
             if user and user.check_password(form.password.data):
                 login_user(user, remember=form.remember_me.data)
                 return redirect("/", 301)
-            return render_template('signin.html', message="Неправильный логин или пароль", form=form)
-        return render_template('signin.html', form=form)
+            return render_template('Login.html', message="Неправильный логин или пароль", form=form)
+        return render_template('Login.html', form=form)
 
 
 @login_required
