@@ -144,6 +144,8 @@ def personal_account(search):
                                        favourite_sites=[],
                                        not_favourite_sites=[],
                                        length=0)
+            else:
+                return redirect('/login')
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
