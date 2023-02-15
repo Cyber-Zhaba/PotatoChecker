@@ -56,12 +56,11 @@
         </h1>
         <div class="u-border-2 u-border-custom-color-4 u-container-style u-custom-color-3 u-group u-radius-50 u-shape-round u-group-1">
           <div class="u-container-layout u-container-layout-1">
-            <div class="u-clearfix u-custom-html u-expanded-width u-custom-html-1"> {% for favourite_website in favourite_sites_names %} <a class="btn btn-info" href="/draw_graphic/{{favourite_website}}">{{favourite_website}}</a> { % endfor %}
-                                        {% for not_favourite_website in not_favourite_sites_names %} <a class="btn btn-info" href="/draw_graphic/{{not_favourite_website}}">{{not_favourite_website}}</a> { % endfor %} <table>
-                <tbody>
-                  <tr></tr>
-                </tbody>
-              </table>
+            <div class="u-clearfix u-custom-html u-expanded-width u-custom-html-1">
+                <main role="main" class="container">
+                    {% block content %}
+                    {% endblock %}
+                </main>
             </div>
           </div>
         </div>
