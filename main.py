@@ -113,7 +113,7 @@ def login():
             user = db_sess.query(User).filter(User.username == form.username.data).first()
             if user and user.check_password(form.password.data):
                 login_user(user, remember=form.remember_me.data)
-                return redirect("/", 301)
+                return redirect("/personal_account/&&%%", 301)
             return render_template('Login.html', message="Неправильный логин или пароль", form=form)
         return render_template('Login.html', form=form)
 
