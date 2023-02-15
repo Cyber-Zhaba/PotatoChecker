@@ -6,10 +6,8 @@ from flask import Flask, request
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_restful import Api
-from requests import delete, post, patch, get
-from werkzeug.exceptions import Unauthorized
-from data import db_session, feedback_resource, sites_resource, users_resource
-from data.feedbacks import Feedbacks
+
+from data import db_session
 from data.sites import Sites
 from data.users import User
 
@@ -60,7 +58,7 @@ def about_page():
 
 @app.route('/account')
 def account_page():
-    return render_template('Personal-account.html')
+    return redirect('/personal_account/search=&&%%')
 
 
 @app.route('/logout')
