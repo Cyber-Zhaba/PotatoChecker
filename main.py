@@ -1,19 +1,13 @@
 import os
 
-import matplotlib as plt
-from flask import make_response
 from flask import Flask, request
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_restful import Api
-from requests import delete, post, patch, get
-from werkzeug.exceptions import Unauthorized
-from data import db_session, feedback_resource, sites_resource, users_resource
-from data.feedbacks import Feedbacks
+
+from data import db_session
 from data.sites import Sites
 from data.users import User
-from scriptes.availability_checker import availability_checker
-
 from forms.registration_forms import RegisterForm, LoginForm
 
 UPLOAD_FOLDER = '/static/img'
@@ -61,7 +55,7 @@ def about_page():
 
 @app.route('/account')
 def account_page():
-    return render_template('Personal-account.html')
+    return redirect('/personal_account/search=0')
 
 
 @app.route('/logout')
@@ -131,17 +125,7 @@ def personal_account(search):
         not_favourite_sites_names = [db_sess.query(Sites).filter(Sites.id == i).name for i in
                                      db_sess.query(Sites).filter(
                                          search in Sites.link and Sites.id not in current_user.favourite_sites)]
-        return render_template('''<table>
-                                    <tr>
-                                        {% for favourite_website in favourite_sites_names %}
-                                            <a class="btn btn-info" href="/draw_graphic/{{favourite_website}}">{{favourite_website}}</a>
-                                        { % endfor %}
-                                        {% for not_favourite_website in not_favourite_sites_names %}
-                                            <a class="btn btn-info" href="/draw_graphic/{{not_favourite_website}}">{{not_favourite_website}}</a>
-                                        { % endfor %}
-                                    </tr> 
-                                    </table>'''
-                               ,
+        return render_template('Personal-account.html',
                                favourite_sites=favourite_sites_names,
                                not_favourite_sites_names=not_favourite_sites_names)
 
