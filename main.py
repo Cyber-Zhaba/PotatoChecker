@@ -138,8 +138,12 @@ def personal_account(search):
                                    favourite_sites=favourite_sites_names,
                                    not_favourite_sites=not_favourite_sites_names,
                                    length=len(favourite_sites_names))
-        except Exception:
-            return redirect('/login')
+        except Exception as error:
+            if 'split' in error.__str__():
+                return render_template('personal_account_table.html',
+                                       favourite_sites=[],
+                                       not_favourite_sites=[],
+                                       length=0)
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
