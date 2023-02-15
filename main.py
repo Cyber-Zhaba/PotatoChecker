@@ -154,9 +154,8 @@ def draw_graphic(website_id):
     reports = [0, 0, 1, 3, 0, 5, 4, 5]
     plt.style.use(['dark_background'])
     plt.plot(time, reports)
-    plt.show()
-    plt.savefig('hohol.png')
-    return redirect('/personal_account')
+    plt.savefig(f'static/img/{current_user.name}.png')
+    return redirect('/personal_account/&&%%')
 
 
 if __name__ == '__main__':
