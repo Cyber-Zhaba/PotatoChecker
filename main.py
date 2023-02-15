@@ -22,6 +22,8 @@ login_manager = LoginManager(app)
 login_manager.init_app(app)
 
 
+# old vers no api TODO: add API!!!
+
 def main():
     db_session.global_init("data/data.db")
     # api.add_resource(users_resource.UsersListResource, '/api/v2/users')
