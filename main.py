@@ -1,5 +1,7 @@
 import os
 
+import matplotlib as plt
+from flask import make_response
 from flask import Flask, request
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
@@ -8,6 +10,7 @@ from flask_restful import Api
 from data import db_session
 from data.sites import Sites
 from data.users import User
+
 from forms.registration_forms import RegisterForm, LoginForm
 
 UPLOAD_FOLDER = '/static/img'
@@ -55,7 +58,7 @@ def about_page():
 
 @app.route('/account')
 def account_page():
-    return redirect('/personal_account/search=0')
+    return redirect('/personal_account/search=&&%%')
 
 
 @app.route('/logout')
@@ -120,14 +123,13 @@ def login():
 def personal_account(search):
     if request.method == 'GET':
         db_sess = db_session.create_session()
-        favourite_sites_names = [db_sess.query(Sites).filter(Sites.id == i).name for i in db_sess.query(Sites).filter(
-            search in Sites.link and current_user.favourite_sites.containes(Sites.id))]
-        not_favourite_sites_names = [db_sess.query(Sites).filter(Sites.id == i).name for i in
-                                     db_sess.query(Sites).filter(
-                                         search in Sites.link and Sites.id not in current_user.favourite_sites)]
-        return render_template('Personal-account.html',
+        favourite_sites_names = db_sess.query(Sites).filter(
+            Sites.link.contains(search), Sites.id.in_(current_user.favourite_sites.split(','))).all()
+        not_favourite_sites_names = db_sess.query(Sites).filter(
+            Sites.link.contains(search), ~ (Sites.id.in_(current_user.favourite_sites.split(',')))).all()
+        return render_template('personal_account_table.html',
                                favourite_sites=favourite_sites_names,
-                               not_favourite_sites_names=not_favourite_sites_names)
+                               not_favourite_sites=not_favourite_sites_names)
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
