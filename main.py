@@ -152,9 +152,18 @@ def personal_account(search):
 def draw_graphic(website_id):
     time = range(1, 9)
     reports = [0, 0, 1, 3, 0, 5, 4, 5]
-    plt.style.use(['dark_background'])
     plt.plot(time, reports)
-    plt.savefig(f'static/img/{current_user.name}.png')
+    fig, ax = plt.subplots(facecolor='#21024c')
+    ax.set_facecolor(color='#21024c')
+    ax.plot(reports, color='#0f497f')
+    ax.tick_params(axis='both', colors='white')
+    ax.spines['left'].set_color('white')
+    ax.spines['bottom'].set_color('white')
+    ax.spines['right'].set_color('#21024c')
+    ax.spines['top'].set_color('#21024c')
+    ax.grid(True)
+    ax.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
+    fig.savefig(f'static/img/{current_user.name}.png', dpi=500)
     return redirect('/personal_account/&&%%')
 
 
