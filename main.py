@@ -58,7 +58,7 @@ def about_page():
 
 @app.route('/account')
 def account_page():
-    return redirect('/personal_account/search=&&%%')
+    return redirect('/personal_account/&&%%')
 
 
 @app.route('/logout')
@@ -129,21 +129,25 @@ def personal_account(search):
                     Sites.id.in_(current_user.favourite_sites.split(','))).all()
                 not_favourite_sites_names = db_sess.query(Sites).filter(
                     ~ (Sites.id.in_(current_user.favourite_sites.split(',')))).all()
+                image_name = 'x'
             else:
                 favourite_sites_names = db_sess.query(Sites).filter(
                     Sites.name.contains(search), Sites.id.in_(current_user.favourite_sites.split(','))).all()
                 not_favourite_sites_names = db_sess.query(Sites).filter(
                     Sites.name.contains(search), ~(Sites.id.in_(current_user.favourite_sites.split(',')))).all()
+                image_name = f'{current_user.name}.png'
             return render_template('personal_account_table.html',
                                    favourite_sites=favourite_sites_names,
                                    not_favourite_sites=not_favourite_sites_names,
-                                   length=len(favourite_sites_names))
+                                   length=len(favourite_sites_names),
+                                   image_name=image_name)
         except Exception as error:
             if 'split' in error.__str__():
                 return render_template('personal_account_table.html',
                                        favourite_sites=[],
                                        not_favourite_sites=[],
-                                       length=0)
+                                       length=0,
+                                       image_name=f'x')
             else:
                 return redirect('/login')
 
@@ -152,10 +156,12 @@ def personal_account(search):
 def draw_graphic(website_id):
     time = range(1, 9)
     reports = [0, 0, 1, 3, 0, 5, 4, 5]
+    db_sess = db_session.create_session()
+    name = db_sess.query(Sites).filter(Sites.id.in_([website_id])).all()[0].name
     plt.style.use(['dark_background'])
     plt.plot(time, reports)
     plt.savefig(f'static/img/{current_user.name}.png')
-    return redirect('/personal_account/&&%%')
+    return redirect(f'/personal_account/{name}')
 
 
 if __name__ == '__main__':
