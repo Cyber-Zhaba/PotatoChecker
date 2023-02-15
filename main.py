@@ -1,6 +1,6 @@
 import os
 
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from flask import make_response
 from flask import Flask, request
 from flask import render_template, redirect
@@ -124,19 +124,34 @@ def login():
 @app.route('/personal_account/<string:search>', methods=['GET'])
 def personal_account(search):
     if request.method == 'GET':
-        db_sess = db_session.create_session()
-        favourite_sites_names = db_sess.query(Sites).filter(
-            Sites.link.contains(search), Sites.id.in_(current_user.favourite_sites.split(','))).all()
-        not_favourite_sites_names = db_sess.query(Sites).filter(
-            Sites.link.contains(search), ~ (Sites.id.in_(current_user.favourite_sites.split(',')))).all()
-        return render_template('personal_account_table.html',
-                               favourite_sites=favourite_sites_names,
-                               not_favourite_sites=not_favourite_sites_names)
+        try:
+            db_sess = db_session.create_session()
+            if search == '&&%%':
+                favourite_sites_names = db_sess.query(Sites).filter(
+                    Sites.id.in_(current_user.favourite_sites.split(','))).all()
+                not_favourite_sites_names = db_sess.query(Sites).filter(
+                    ~ (Sites.id.in_(current_user.favourite_sites.split(',')))).all()
+            else:
+                favourite_sites_names = db_sess.query(Sites).filter(
+                    Sites.name.contains(search), Sites.id.in_(current_user.favourite_sites.split(','))).all()
+                not_favourite_sites_names = db_sess.query(Sites).filter(
+                    Sites.name.contains(search), ~(Sites.id.in_(current_user.favourite_sites.split(',')))).all()
+            return render_template('personal_account_table.html',
+                                   favourite_sites=favourite_sites_names,
+                                   not_favourite_sites=not_favourite_sites_names,
+                                   length=len(favourite_sites_names))
+        except Exception:
+            return redirect('/login')
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
 def draw_graphic(website_id):
-    print(1)
+    time = range(1, 9)
+    reports = [0, 0, 1, 3, 0, 5, 4, 5]
+    plt.style.use(['dark_background'])
+    plt.plot(time, reports)
+    plt.show()
+    plt.savefig('hohol.png')
     return redirect('/personal_account')
 
 

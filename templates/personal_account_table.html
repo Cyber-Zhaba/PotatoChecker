@@ -1,6 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "Personal-account.html" %}
 
+{% block content %}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet"
@@ -15,9 +15,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap"
       rel="stylesheet">
 <style>
-table, th, td {
-  border:1px solid black;
-}
+    table, th, td {
+      border:1px solid black;
+    }
+    a:link {
+      color: black;
+      background-color: transparent;
+      text-decoration: none;
+    }
 
 </style>
 <body>
@@ -33,19 +38,20 @@ table, th, td {
     {% for favourite_website in favourite_sites %}
     <tr class="bg-info">
         <th scope="row">{{ loop.index }}</th>
-        <td><a href="/draw_graphic/{{favourite_website}}">{{favourite_website.name}}</a></td>
+        <td><a style="font-size: 2rem" href="/draw_graphic/{{favourite_website.id}}">{{favourite_website.name}}</a></td>
         <td>{{favourite_website.state}}</td>
     </tr>
     {% endfor %}
 
     {% for not_favourite_website in not_favourite_sites %}
     <tr>
-        <th scope="row">{{ loop.index }}</th>
-        <td><a href="/draw_graphic/{{favourite_website}}">{{not_favourite_website.name}}</a></td>
+        <th scope="row">{{ loop.index + length }}</th>
+        <td><a style="font-size: 2rem"
+               href="/draw_graphic/{{not_favourite_website.id}}">{{not_favourite_website.name}}</a></td>
         <td>{{not_favourite_website.state}}</td>
     </tr>
     {% endfor %}
     </tbody>
 </table>
 </body>
-</html>
+{% endblock %}
