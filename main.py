@@ -12,7 +12,6 @@ from data import db_session, feedback_resource, sites_resource, users_resource
 from data.feedbacks import Feedbacks
 from data.sites import Sites
 from data.users import User
-from scriptes.availability_checker import availability_checker
 
 from forms.registration_forms import RegisterForm, LoginForm
 
@@ -126,24 +125,13 @@ def login():
 def personal_account(search):
     if request.method == 'GET':
         db_sess = db_session.create_session()
-        favourite_sites_names = [db_sess.query(Sites).filter(Sites.id == i).name for i in db_sess.query(Sites).filter(
-            search in Sites.link and current_user.favourite_sites.containes(Sites.id))]
-        not_favourite_sites_names = [db_sess.query(Sites).filter(Sites.id == i).name for i in
-                                     db_sess.query(Sites).filter(
-                                         search in Sites.link and Sites.id not in current_user.favourite_sites)]
-        return render_template('''<table>
-                                    <tr>
-                                        {% for favourite_website in favourite_sites_names %}
-                                            <a class="btn btn-info" href="/draw_graphic/{{favourite_website}}">{{favourite_website}}</a>
-                                        { % endfor %}
-                                        {% for not_favourite_website in not_favourite_sites_names %}
-                                            <a class="btn btn-info" href="/draw_graphic/{{not_favourite_website}}">{{not_favourite_website}}</a>
-                                        { % endfor %}
-                                    </tr> 
-                                    </table>'''
-                               ,
+        favourite_sites_names = db_sess.query(Sites).filter(
+            Sites.link.contains(search), Sites.id.in_(current_user.favourite_sites.split(','))).all()
+        not_favourite_sites_names = db_sess.query(Sites).filter(
+            Sites.link.contains(search), ~ (Sites.id.in_(current_user.favourite_sites.split(',')))).all()
+        return render_template('personal_account_table.html',
                                favourite_sites=favourite_sites_names,
-                               not_favourite_sites_names=not_favourite_sites_names)
+                               not_favourite_sites=not_favourite_sites_names)
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
