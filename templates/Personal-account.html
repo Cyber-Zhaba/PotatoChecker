@@ -1,20 +1,16 @@
 <!DOCTYPE html>
-<html style="font-size: 16px;" lang="en"><head>
+    <html style="font-size: 16px;" lang="en"><head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <meta name="keywords" content="Личный кабинет">
     <meta name="description" content="">
     <title>Personal account</title>
     <link rel="stylesheet" href="../static/css/pages.css" media="screen">
-    <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-          crossorigin="anonymous">
     <link rel="stylesheet" href="../static/css/Personal-account.css" media="screen">
     <script class="u-script" type="text/javascript" src="../static/js/jquery.js" defer=""></script>
     <script class="u-script" type="text/javascript" src="../static/js/pages.js" defer=""></script>
+    <meta name="generator" content="Nicepage 5.5.0, nicepage.com">
     <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
-
     <meta name="theme-color" content="#0f497f">
     <meta property="og:title" content="Personal account">
     <meta property="og:type" content="website">
@@ -54,25 +50,63 @@
       <div class="u-clearfix u-sheet u-sheet-1">
         <h1 class="u-align-center u-text u-text-default u-text-1">Личный кабинет<br>
         </h1>
-        <div class="u-border-2 u-border-custom-color-4 u-container-style u-custom-color-3 u-group u-radius-50 u-shape-round u-group-1">
-          <div class="u-container-layout u-container-layout-1">
-            <div class="u-clearfix u-custom-html u-expanded-width u-custom-html-1">
-                <main role="main" class="container">
-                    {% block content %}
-                    {% endblock %}
-                </main>
+        <div class="u-clearfix u-expanded-width u-gutter-22 u-layout-wrap u-layout-wrap-1">
+          <div class="u-layout">
+            <div class="u-layout-row">
+              <div class="u-container-style u-layout-cell u-radius-25 u-shape-round u-size-30 u-layout-cell-1">
+                <div class="u-border-3 u-border-custom-color-4 u-container-layout u-container-layout-1">
+                  <div class="u-clearfix u-custom-html u-expanded u-custom-html-1">
+                    <main role="main" class="container"> {% block content %}
+                    {% endblock %} </main>
+                  </div>
+                </div>
+              </div>
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-2">
+                <div class="u-border-3 u-border-custom-color-4 u-container-layout u-container-layout-2">
+                  <div class="u-clearfix u-custom-html u-expanded u-custom-html-2">
+                    <img src="../static/img/plot.png" width="100%" height="100%" alt="Plot">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="u-clearfix u-custom-html u-custom-html-2">
-          <img src="{{ img_src }}" width="461" height="462" alt="Plot">
+        <div class="u-clearfix u-expanded-width u-gutter-0 u-layout-wrap u-layout-wrap-2">
+          <div class="u-layout">
+            <div class="u-layout-row">
+              <div class="u-container-style u-layout-cell u-size-20 u-layout-cell-3">
+                <div class="u-container-layout u-container-layout-3">
+                  <a href="https://nicepage.com/c/about-us-html-templates" class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-1">Добавить сайт</a>
+                </div>
+              </div>
+              <div class="u-container-style u-layout-cell u-size-25 u-layout-cell-4">
+                <div class="u-container-layout u-valign-top u-container-layout-4">
+                  <a href="https://nicepage.com/k/projects-website-templates" class="u-align-right u-border-none u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-2">Удалить текущий сайт</a>
+                </div>
+              </div>
+              <div class="u-container-style u-layout-cell u-size-15 u-layout-cell-5">
+                <div class="u-container-layout u-container-layout-5">
+                  <a href="https://nicepage.me" class="u-align-right u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-3">Сообщить о проблеме</a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <a href="https://nicepage.com/c/real-estate-html-templates" class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-1">добавить сайт</a>
-        <a href="https://nicepage.dev" class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-2">Сообщить о неполадках</a>
-        <a href="https://nicepage.com/wordpress-themes" class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-3">Удалить выбранный сайт</a>
-        <h5 class="u-align-center u-text u-text-default u-text-2">Описание выбранного сайта</h5>
-        <div class="u-clearfix u-custom-html u-expanded-width u-custom-html-3">
-          <p>{{ description }}</p>
+        <div class="u-clearfix u-expanded-width u-gutter-0 u-layout-wrap u-layout-wrap-3">
+          <div class="u-layout">
+            <div class="u-layout-col">
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-6">
+                <div class="u-container-layout u-container-layout-6">
+                  <p class="u-text u-text-2"> Описание выбранного сайта</p>
+                </div>
+              </div>
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-7">
+                <div class="u-container-layout u-container-layout-7">
+                  <div class="u-clearfix u-custom-html u-expanded u-custom-html-3">{{ description }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
