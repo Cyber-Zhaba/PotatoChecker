@@ -25,7 +25,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 
-
+#reset
 def main():
     api = Api(app)
 
