@@ -15,8 +15,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap"
       rel="stylesheet">
 <style>
-    table, th, td {
-      border:1px solid black;
+    table {
+        border-radius: 25px;
+        background-color: transparent;
     }
     a:link {
       color: black;
@@ -26,7 +27,7 @@
 
 </style>
 <body>
-<table class="table table-striped table-dark">
+<table width="100%" height="100%">
     <thead>
     <tr>
         <th scope="col">#</th>
@@ -36,19 +37,18 @@
     </thead>
     <tbody>
     {% for favourite_website in favourite_sites %}
-    <tr class="bg-info">
-        <th scope="row">{{ loop.index }}</th>
-        <td><a style="font-size: 2rem" href="/draw_graphic/{{favourite_website.id}}">{{favourite_website.name}}</a></td>
-        <td>{{favourite_website.state}}</td>
+    <tr class="table_favourite">
+        <th scope="row" style="color: #C5E70D">{{ loop.index }}</th>
+        <td><a class="table_favourite" style="font-size: 2rem; color: #C5E70D;" href="/draw_graphic/{{favourite_website.id}}">{{favourite_website.name}}</a></td>
+        <td><a style="color: #C5E70D; font-size: 1.5rem"> {{favourite_website.state}}</a></td>
     </tr>
     {% endfor %}
 
     {% for not_favourite_website in not_favourite_sites %}
     <tr>
         <th scope="row">{{ loop.index + length }}</th>
-        <td><a style="font-size: 2rem"
-               href="/draw_graphic/{{not_favourite_website.id}}">{{not_favourite_website.name}}</a></td>
-        <td>{{not_favourite_website.state}}</td>
+        <td><a style="font-size: 2rem; color: white"  href="/draw_graphic/{{not_favourite_website.id}}">{{not_favourite_website.name}}</a></td>
+        <td style="font-size: 1.5rem;">{{not_favourite_website.state}}</td>
     </tr>
     {% endfor %}
     </tbody>
