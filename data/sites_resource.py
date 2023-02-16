@@ -1,3 +1,5 @@
+import time
+
 from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
 from data import db_session
@@ -16,12 +18,12 @@ class SitesResource(Resource):
     def __init__(self) -> None:
         """Create sqldb parser"""
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('owner_id', required=True)
-        self.parser.add_argument('link', required=True)
-        self.parser.add_argument('description', required=True)
-        self.parser.add_argument('ping', required=True)
+        self.parser.add_argument('owner_id', required=False)
+        self.parser.add_argument('link', required=False)
+        self.parser.add_argument('description', required=False)
+        self.parser.add_argument('ping', required=False)
         self.parser.add_argument('check_time')
-        self.parser.add_argument('ids_feedback', required=True)
+        self.parser.add_argument('ids_feedback', required=False)
 
     @staticmethod
     def get(site_id: int) -> Response:
@@ -45,42 +47,49 @@ class SitesResource(Resource):
 class SitesListResource(Resource):
     def __init__(self) -> None:
         """Create sqldb parser"""
+        self.session = db_session.create_session()
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('owner_id', required=False)
         self.parser.add_argument('name', required=False)
         self.parser.add_argument('link', required=False)
         self.parser.add_argument('description', required=False)
-        self.parser.add_argument('state', required=False)
+        self.parser.add_argument('ping', required=False)
         self.parser.add_argument('ids_feedbacks', required=False)
         self.parser.add_argument('check_time', required=False)
-
         self.parser.add_argument('type', required=True)
         self.parser.add_argument('favourite_sites', required=False)
 
     def get(self) -> Response:
         """API method get"""
         args = self.parser.parse_args()
-        session = db_session.create_session()
-
+        if args['favourite_sites'] is None:
+            favourite = []
+        else:
+            favourite = args['favourite_sites'].split(',')
+        all_sites = self.session.query(Sites)
         match args['type']:
-            case 'favourite_sites':
-                sites = session.query(Sites).filter(Sites.id.in_(args['favourite_sites'].split(','))).all()
-            case 'not_favourite_sites':
-                sites = session.query(Sites).filter(~ (Sites.id.in_(args['favourite_sites'].split(',')))).all()
-            case 'favourite_sites_and_name':
-                sites = session.query(Sites).filter(Sites.name.contains(args['name']),
-                                                    Sites.id.in_(args['favourite_sites'].split(','))).all()
-            case 'not_favourite_sites_and_name':
-                sites = session.query(Sites).filter(Sites.name.contains(args['name']),
-                                                    ~(Sites.id.in_(args['favourite_sites'].split(',')))).all()
+            case 'all_by_groups':
+                sites_set = set(all_sites.all())
+                favourite_sites_set = set(all_sites.filter(Sites.id.in_(favourite)).all())
+                sites_not_favourite = sites_set - favourite_sites_set
+                result = jsonify(
+                    {'favourite_sites': [item.to_dict(only=('name', 'id', 'link')) for item in favourite_sites_set],
+                     'not_favourite_sites': [item.to_dict(only=('name', 'id', 'link')) for item in sites_not_favourite]})
+            case 'sites_by_name':
+                sites_favourite = all_sites.filter(Sites.name.contains(args['name']),
+                                                   Sites.id.in_(favourite)).all()
+                sites_not_favourite = all_sites.filter(Sites.name.contains(args['name']),
+                                                       ~Sites.id.in_(favourite)).all()
+                result = jsonify({'favourite_sites': [item.to_dict(only=('name', 'id', 'link'))
+                                                      for item in sites_favourite],
+                                  'not_favourite_sites': [item.to_dict(only=('name', 'id', 'link'))
+                                                          for item in sites_not_favourite]})
             case 'all':
-                sites = session.query(Sites).all()
+                result = self.session.query(Sites).all()
             case 'name':
-                sites = session.query(Sites).filter(Sites.name.contains(args['name'])).all()
+                result = self.session.query(Sites).filter(Sites.name.contains(args['name'])).all()
 
-        return jsonify({'sites': [
-            item.to_dict(rules=("-site", "-site")) for item in sites
-        ]})
+        return result
 
     def post(self) -> Response:
         """API method post"""

@@ -10,3 +10,5 @@ sqlalchemy_serializer~=1.4.1
 flask_wtf~=1.1.1
 chardet~=5.1.0
 matplotlib~=3.6.2
+Pillow~=9.3.0
+gevent~=22.10.2

@@ -1,4 +1,5 @@
 import os
+import time
 
 import matplotlib.pyplot as plt
 from flask import make_response
@@ -6,21 +7,22 @@ from flask import Flask, request
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_restful import Api
-from data.users_resource import UsersResource,UsersListResource
+from data.users_resource import UsersResource, UsersListResource
 from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
 from requests import get, post, delete
 from forms.registration_forms import RegisterForm, LoginForm
 from forms.util_forms import NameWebSiteForm
-
+from gevent.pywsgi import WSGIServer
+from gevent import monkey
 import PIL
-
 from data import db_session
 from data.sites import Sites
 from data.users import User
 
 from forms.registration_forms import RegisterForm, LoginForm
 
+monkey.patch_all()
 UPLOAD_FOLDER = '/static/img'
 app = Flask(__name__)
 api = Api(app)
@@ -41,8 +43,14 @@ def main():
     api.add_resource(FeedbackResource, '/api/feedback/<int:feedback_id>')
     db_session.global_init("data/data.db")
 
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
+    http.serve_forever()
+
+
+@app.errorhandler(401)
+def log_redirect(error):
+    print(error)
+    return redirect('/login')
 
 
 @app.route('/About.html')
@@ -131,75 +139,34 @@ def login():
         return render_template('Login.html', form=form)
 
 
-@login_required
-@app.route('/<search>', defaults={'search': None})
+@app.route('/<search>', defaults={'search': None}, methods=['GET', 'POST'])
 @app.route('/personal_account/<string:search>', methods=['GET', 'POST'])
+@login_required
 def personal_account(search):
     form = NameWebSiteForm()
-    image_name = None
+    image_name = f'{current_user.name}.png'
     if request.method == 'POST':
         search = form.name.data
+        image_name = None
+    if search is None:
+        image_name = None
+        answer = get('http://localhost:5000/api/sites',
+                     json={'type': 'all_by_groups',
+                           'favourite_sites': current_user.favourite_sites}).json()
     else:
-        image_name = f'{current_user.name}.png'
-
-    try:
-        if search is None:
-            favourite_sites_names = get('http://localhost:5000/api/sites',
-                                        json={
-                                            'type': 'favourite_sites',
-                                            'favourite_sites': current_user.favourite_sites
-                                        }).json()
-            not_favourite_sites_names = get('http://localhost:5000/api/sites',
-                                            json={
-                                                'type': 'not_favourite_sites',
-                                                'favourite_sites': current_user.favourite_sites
-                                            }).json()
-        else:
-            favourite_sites_names = get('http://localhost:5000/api/sites',
-                                        json={
-                                            'type': 'favourite_sites_and_name',
-                                            'favourite_sites': current_user.favourite_sites,
-                                            'name': search
-                                        }).json()
-            not_favourite_sites_names = get('http://localhost:5000/api/sites',
-                                            json={
-                                                'type': 'not_favourite_sites_and_name',
-                                                'favourite_sites': current_user.favourite_sites,
-                                                'name': search
-                                            }).json()
-
-        return render_template('personal_account_table.html',
-                               favourite_sites=favourite_sites_names['sites'],
-                               not_favourite_sites=not_favourite_sites_names['sites'],
-                               length=len(favourite_sites_names['sites']),
-                               image_name=image_name,
-                               form=form)
-    except Exception as error:
-        if 'split' in error.__str__():
-            image_name = None
-            if request.method == 'POST':
-                search = form.name.data
-            else:
-                image_name = f'{current_user.name}.png'
-
-            if search is None:
-                not_favourite_sites_names = get('http://localhost:5000/api/sites',
-                                                json={
-                                                    'type': 'all'
-                                                })
-            else:
-                not_favourite_sites_names = get('http://localhost:5000/api/sites',
-                                                json={
-                                                    'name': search
-                                                })
-                image_name = f'{current_user.name}.png'
-            return render_template('personal_account_table.html',
-                                   favourite_sites=[],
-                                   not_favourite_sites=not_favourite_sites_names,
-                                   length=0,
-                                   image_name=image_name)
-        else:
-            return redirect('/login')
+        answer = get('http://localhost:5000/api/sites',
+                     json={'type': 'sites_by_name',
+                           'name': search,
+                           'favourite_sites': current_user.favourite_sites}).json()
+    favourite_sites_names = answer['favourite_sites']
+    not_favourite_sites_names = answer['not_favourite_sites']
+    return render_template('personal_account_table.html',
+                           favourite_sites=favourite_sites_names,
+                           not_favourite_sites=not_favourite_sites_names,
+                           length=len(favourite_sites_names),
+                           image_name=image_name,
+                           form=form,
+                           description="Visit our GayWebsite.com")
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
@@ -224,7 +191,7 @@ def draw_graphic(website_id):
     ax.spines['top'].set_color('#21024c')
     ax.grid(True)
     ax.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
-    fig.savefig(f'static/img/{current_user.name}.png', dpi=500)
+    fig.savefig(f'static/img/{current_user.name}.png', dpi=100)
     return redirect(f'/personal_account/{name}')
 
 
