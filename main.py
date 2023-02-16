@@ -11,6 +11,8 @@ from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
 from requests import get, post, delete
 
+import PIL
+
 from data import db_session
 from data.sites import Sites
 from data.users import User
@@ -196,6 +198,11 @@ def draw_graphic(website_id):
     ax.set_facecolor(color='#21024c')
     ax.plot(reports, color='#0f497f')
     ax.tick_params(axis='both', colors='white')
+    ax.xaxis.label.set_color('white')
+    ax.yaxis.label.set_color('white')
+    ax.set_xlabel('ЧАСЫ')
+    ax.set_ylabel('КОЛИЧЕСТВО ЖАЛОБ')
+
     ax.spines['left'].set_color('white')
     ax.spines['bottom'].set_color('white')
     ax.spines['right'].set_color('#21024c')
