@@ -12,6 +12,7 @@ from data.sites import Sites
 from data.users import User
 
 from forms.registration_forms import RegisterForm, LoginForm
+from forms.util_forms import NameWebSiteForm
 
 UPLOAD_FOLDER = '/static/img'
 app = Flask(__name__)
@@ -60,7 +61,7 @@ def about_page():
 
 @app.route('/account')
 def account_page():
-    return redirect('/personal_account/&&%%')
+    return redirect('/personal_account')
 
 
 @app.route('/logout')
@@ -104,54 +105,60 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
     if request.method == 'GET':
-        form = LoginForm()
         return render_template('Login.html', form=form)
-
     elif request.method == 'POST':
-        form = LoginForm()
         if form.validate_on_submit():
             db_sess = db_session.create_session()
             user = db_sess.query(User).filter(User.username == form.username.data).first()
             if user and user.check_password(form.password.data):
                 login_user(user, remember=form.remember_me.data)
-                return redirect("/personal_account/&&%%", 301)
+                return redirect("/personal_account", 301)
             return render_template('Login.html', message="Неправильный логин или пароль", form=form)
         return render_template('Login.html', form=form)
 
 
 @login_required
-@app.route('/personal_account/<string:search>', methods=['GET'])
+@app.route('/<search>', defaults={'search': None})
+@app.route('/personal_account/<string:search>', methods=['GET', 'POST'])
 def personal_account(search):
-    if request.method == 'GET':
-        try:
-            db_sess = db_session.create_session()
-            if search == '&&%%':
-                favourite_sites_names = db_sess.query(Sites).filter(
-                    Sites.id.in_(current_user.favourite_sites.split(','))).all()
-                not_favourite_sites_names = db_sess.query(Sites).filter(
-                    ~ (Sites.id.in_(current_user.favourite_sites.split(',')))).all()
-                image_name = 'x'
-            else:
-                favourite_sites_names = db_sess.query(Sites).filter(
-                    Sites.name.contains(search), Sites.id.in_(current_user.favourite_sites.split(','))).all()
-                not_favourite_sites_names = db_sess.query(Sites).filter(
-                    Sites.name.contains(search), ~(Sites.id.in_(current_user.favourite_sites.split(',')))).all()
-                image_name = f'{current_user.name}.png'
+    form = NameWebSiteForm()
+    image_name = None
+    if request.method == 'POST':
+        search = form.name.data
+    else:
+        image_name = f'{current_user.name}.png'
+
+    try:
+        db_sess = db_session.create_session()
+        if search is None:
+            favourite_sites_names = db_sess.query(Sites).filter(
+                Sites.id.in_(current_user.favourite_sites.split(','))).all()
+            not_favourite_sites_names = db_sess.query(Sites).filter(
+                ~ (Sites.id.in_(current_user.favourite_sites.split(',')))).all()
+        else:
+            favourite_sites_names = db_sess.query(Sites).filter(
+                Sites.name.contains(search), Sites.id.in_(current_user.favourite_sites.split(','))).all()
+            not_favourite_sites_names = db_sess.query(Sites).filter(
+                Sites.name.contains(search), ~(Sites.id.in_(current_user.favourite_sites.split(',')))).all()
+
+        return render_template('personal_account_table.html',
+                               favourite_sites=favourite_sites_names,
+                               not_favourite_sites=not_favourite_sites_names,
+                               length=len(favourite_sites_names),
+                               image_name=image_name,
+                               form=form)
+    except Exception as error:
+        if 'split' in error.__str__():
             return render_template('personal_account_table.html',
-                                   favourite_sites=favourite_sites_names,
-                                   not_favourite_sites=not_favourite_sites_names,
-                                   length=len(favourite_sites_names),
-                                   image_name=image_name)
-        except Exception as error:
-            if 'split' in error.__str__():
-                return render_template('personal_account_table.html',
-                                       favourite_sites=[],
-                                       not_favourite_sites=[],
-                                       length=0,
-                                       image_name=f'x')
-            else:
-                return redirect('/login')
+                                   favourite_sites=[],
+                                   not_favourite_sites=[],
+                                   length=0,
+                                   image_name=f'x',
+                                   form=form)
+        else:
+            return redirect('/login')
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
