@@ -7,6 +7,8 @@ from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_restful import Api
 
+import PIL
+
 from data import db_session
 from data.sites import Sites
 from data.users import User
@@ -145,9 +147,15 @@ def personal_account(search):
                                    image_name=image_name)
         except Exception as error:
             if 'split' in error.__str__():
+                db_sess = db_session.create_session()
+                if search == '&&%%':
+                    not_favourite_sites_names = db_sess.query(Sites).all()
+                else:
+                    not_favourite_sites_names = db_sess.query(Sites).filter(
+                        Sites.name.contains(search)).all()
                 return render_template('personal_account_table.html',
                                        favourite_sites=[],
-                                       not_favourite_sites=[],
+                                       not_favourite_sites=not_favourite_sites_names,
                                        length=0,
                                        image_name=f'x')
             else:
@@ -165,13 +173,18 @@ def draw_graphic(website_id):
     ax.set_facecolor(color='#21024c')
     ax.plot(reports, color='#0f497f')
     ax.tick_params(axis='both', colors='white')
+    ax.xaxis.label.set_color('white')
+    ax.yaxis.label.set_color('white')
+    ax.set_xlabel('ЧАСЫ')
+    ax.set_ylabel('КОЛИЧЕСТВО ЖАЛОБ')
+
     ax.spines['left'].set_color('white')
     ax.spines['bottom'].set_color('white')
     ax.spines['right'].set_color('#21024c')
     ax.spines['top'].set_color('#21024c')
     ax.grid(True)
     ax.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
-    fig.savefig(f'static/img/{current_user.name}.png', dpi=500)
+    fig.savefig(f'static/img/{current_user.name}.png', dpi=200)
     return redirect(f'/personal_account/{name}')
 
 
