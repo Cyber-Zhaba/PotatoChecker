@@ -15,4 +15,3 @@ class Sites(SqlAlchemyBase, SerializerMixin):
     ping = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     check_time = sqlalchemy.Column(sqlalchemy.DATETIME)
     ids_feedbacks = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    reports

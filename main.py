@@ -1,8 +1,4 @@
-import os
-import time
-
 import matplotlib.pyplot as plt
-from flask import make_response
 from flask import Flask, request
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
@@ -10,17 +6,13 @@ from flask_restful import Api
 from data.users_resource import UsersResource, UsersListResource
 from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
-from requests import get, post, delete
-from forms.registration_forms import RegisterForm, LoginForm
-from forms.util_forms import NameWebSiteForm
+from requests import get, post
 from gevent.pywsgi import WSGIServer
 from gevent import monkey
-import PIL
 from data import db_session
-from data.sites import Sites
 from data.users import User
-
 from forms.registration_forms import RegisterForm, LoginForm
+from forms.util_forms import NameWebSiteForm
 
 monkey.patch_all()
 UPLOAD_FOLDER = '/static/img'

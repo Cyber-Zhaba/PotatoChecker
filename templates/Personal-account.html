@@ -18,6 +18,7 @@
     <meta name="theme-color" content="#0f497f">
     <meta property="og:title" content="Personal account">
     <meta property="og:type" content="website">
+  <meta data-intl-tel-input-cdn-path="intlTelInput/"></head>
   <body class="u-body u-xl-mode" data-lang="en"><header class="u-black u-clearfix u-header u-header" id="sec-f6fd"><div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
         <nav class="u-dropdown-icon u-menu u-menu-hamburger u-offcanvas u-menu-1" data-responsive-from="XL" data-position="">
           <div class="menu-collapse" style="font-size: 1rem; letter-spacing: 0px;">
@@ -58,44 +59,38 @@
             <div class="u-layout-row">
               <div class="u-container-style u-layout-cell u-radius-25 u-shape-round u-size-30 u-layout-cell-1">
                 <div class="u-border-3 u-border-custom-color-4 u-container-layout u-container-layout-1">
-                    {% include "block_search.html" %}
+                  <div class="u-clearfix u-custom-html u-custom-html-1">{% include "block_search.html" %}
                     {% block body %}
-                    {% endblock %}
-                  <div class="u-clearfix u-custom-html u-custom-html-1">
-                    <main role="main" class="container">
-                        {% block content %}
+                    {% endblock %}</div>
+                  <div class="u-clearfix u-custom-html u-preserve-proportions u-custom-html-2">
+                    <main role="main" class="container"> {% block content %}
                     {% endblock %} </main>
                   </div>
                 </div>
               </div>
               <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-2">
                 <div class="u-border-3 u-border-custom-color-4 u-container-layout u-container-layout-2">
-                  <div class="u-clearfix u-custom-html u-expanded u-custom-html-2">
-                      {% if image_name is not none %}
-                        <img src="../static/img/{{image_name}}" width="99%" height="99%" alt="Plot">
-                      {% endif %}
+                  <div class="u-clearfix u-custom-html u-expanded u-custom-html-3">
+                    <img src="../static/img/{{image_name}}" width="99%" height="99%" alt="Plot">
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="u-clearfix u-expanded-width u-gutter-0 u-layout-wrap u-layout-wrap-2">
-          <div class="u-layout">
+        <div class="u-clearfix u-expanded-width u-gutter-100 u-layout-wrap u-layout-wrap-2">
+          <div class="u-gutter-0 u-layout">
             <div class="u-layout-row">
-              <div class="u-container-style u-layout-cell u-size-20 u-layout-cell-3">
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-3">
                 <div class="u-container-layout u-container-layout-3">
-                  <a href="" class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-2">Добавить сайт</a>
+                  <a href="" class="u-border-3 u-border-hover-palette-4-light-2 u-border-white u-bottom-left-radius-0 u-bottom-right-radius-0 u-btn u-btn-round u-button-style u-none u-radius-21 u-text-active-palette-4-dark-3 u-text-body-alt-color u-text-hover-palette-4-light-3 u-top-left-radius-0 u-top-right-radius-0 u-btn-1">Добавить сайт</a>
+                  <a href="" class="u-align-right u-border-3 u-border-hover-palette-2-light-2 u-border-white u-btn u-btn-round u-button-style u-none u-radius-50 u-text-active-palette-2-dark-2 u-text-hover-palette-2-light-3 u-text-white u-btn-2">Сообщить о Неполадках</a>
                 </div>
               </div>
-              <div class="u-container-style u-layout-cell u-size-25 u-layout-cell-4">
-                <div class="u-container-layout u-valign-top u-container-layout-4">
-                  <a href="" class="u-align-right u-border-none u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-3">Удалить текущий сайт</a>
-                </div>
-              </div>
-              <div class="u-container-style u-layout-cell u-size-15 u-layout-cell-5">
-                <div class="u-container-layout u-container-layout-5">
-                  <a href="" class="u-align-right u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-50 u-btn-4">Сообщить о проблеме</a>
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-4">
+                <div class="u-container-layout u-container-layout-4">
+                  <a href="" class="u-border-3 u-border-hover-palette-3-light-2 u-border-white u-btn u-btn-round u-button-style u-none u-radius-50 u-text-active-palette-3-dark-2 u-text-body-alt-color u-btn-3">Добавить В избранное</a>
+                  <a href="" class="u-align-right u-border-3 u-border-hover-palette-2-light-2 u-border-white u-btn u-btn-round u-button-style u-none u-radius-50 u-text-active-palette-2-dark-3 u-text-body-alt-color u-btn-4">Удалить текущий сайт из избранного</a>
                 </div>
               </div>
             </div>
@@ -104,14 +99,17 @@
         <div class="u-clearfix u-expanded-width u-gutter-0 u-layout-wrap u-layout-wrap-3">
           <div class="u-layout">
             <div class="u-layout-col">
-              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-6">
-                <div class="u-container-layout u-container-layout-6">
-                  <p class="u-text u-text-2">Отзывы</p>
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-5">
+                <div class="u-container-layout u-valign-middle u-container-layout-5">
+                  <p class="u-align-center u-text u-text-default u-text-2">Отзывы:&nbsp;</p>
                 </div>
               </div>
-              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-7">
-                <div class="u-container-layout u-container-layout-7">
-                  <div class="u-clearfix u-custom-html u-expanded u-custom-html-3">{{ description }}</div>
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-6">
+                <div class="u-container-layout u-container-layout-6">
+                  <div class="u-clearfix u-custom-html u-expanded-width u-custom-html-4"></div>
+                  <div class="u-clearfix u-custom-html u-expanded-width u-custom-html-5">
+                    #КОМЕНТЫ СЮДА
+                  </div>
                 </div>
               </div>
             </div>
