@@ -140,6 +140,7 @@ def personal_account(search):
                 not_favourite_sites_names = db_sess.query(Sites).filter(
                     Sites.name.contains(search), ~(Sites.id.in_(current_user.favourite_sites.split(',')))).all()
                 image_name = f'{current_user.name}.png'
+            print(1)
             return render_template('personal_account_table.html',
                                    favourite_sites=favourite_sites_names,
                                    not_favourite_sites=not_favourite_sites_names,
@@ -150,14 +151,16 @@ def personal_account(search):
                 db_sess = db_session.create_session()
                 if search == '&&%%':
                     not_favourite_sites_names = db_sess.query(Sites).all()
+                    image_name = f'x'
                 else:
                     not_favourite_sites_names = db_sess.query(Sites).filter(
                         Sites.name.contains(search)).all()
+                    image_name = f'{current_user.name}.png'
                 return render_template('personal_account_table.html',
                                        favourite_sites=[],
                                        not_favourite_sites=not_favourite_sites_names,
                                        length=0,
-                                       image_name=f'x')
+                                       image_name=image_name)
             else:
                 return redirect('/login')
 
