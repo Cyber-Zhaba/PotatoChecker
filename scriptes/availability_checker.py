@@ -21,26 +21,26 @@ async def ping_website(website):
 
 async def run_pings():
     while True:
-        results = await asyncio.gather(*[ping_website(website[1]) for website in websites])
+        results = await asyncio.gather(*[ping_website(website[1].split("//")[1] if "//" in website[1] else website[1]) for website in websites])
         for result in results:
             res_id = result[0][0]
             site_ping = result[2]
             result = chardet.detect(site_ping)
             decoded = site_ping.decode(result['encoding'])
             result_ping = decoded.split("\r\n")[-2].split(',')[-1].split(' = ')[-1].split()[0]
-            db_sess = db_session.create_session()
+            work_db = db_session.create_session()
             site = Sites(
                 id=res_id,
-                link=db_sess.query(Sites).filter(Sites.id == res_id).link,
-                owner_id=db_sess.query(Sites).filter(Sites.id == res_id).owner_id,
+                link=work_db.query(Sites).filter(Sites.id == res_id).link,
+                owner_id=work_db.query(Sites).filter(Sites.id == res_id).owner_id,
                 ping=result_ping,
                 check_time=datetime.now(),
-                description=db_sess.query(Sites).filter(Sites.id == res_id).description,
-                ids_feedbacks=db_sess.query(Sites).filter(Sites.id == res_id).ids_feedbacks
+                description=work_db.query(Sites).filter(Sites.id == res_id).description,
+                ids_feedbacks=work_db.query(Sites).filter(Sites.id == res_id).ids_feedbacks
             )
             db_sess.add(site)
             db_sess.commit()
         await asyncio.sleep(120)  # ждем 2 минуты перед повторной проверкой
 
 
-asyncio.run(run_pings()) #запуск тестиорования сайтов перекинуть в main
+asyncio.run(run_pings())  # запуск тестиорования сайтов перекинуть в main

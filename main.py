@@ -177,21 +177,19 @@ def draw_graphic(website_id):
     name = get(f'http://localhost:5000/api/sites/{website_id}').json()['sites']['name']
     plt.plot(time, reports)
     fig, ax = plt.subplots(facecolor='#21024c')
+    ax.set_title(name.upper(), color='white', size='20')
     ax.set_facecolor(color='#21024c')
     ax.plot(reports, color='#0f497f')
     ax.tick_params(axis='both', colors='white')
-    ax.xaxis.label.set_color('white')
-    ax.yaxis.label.set_color('white')
-    ax.set_xlabel('ЧАСЫ')
-    ax.set_ylabel('КОЛИЧЕСТВО ЖАЛОБ')
-
+    ax.set_xlabel('Часы', color='white', size='13')
+    ax.set_ylabel('Количество жалоб', color='white', size='13')
     ax.spines['left'].set_color('white')
     ax.spines['bottom'].set_color('white')
     ax.spines['right'].set_color('#21024c')
     ax.spines['top'].set_color('#21024c')
     ax.grid(True)
     ax.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
-    fig.savefig(f'static/img/{current_user.name}.png', dpi=100)
+    fig.savefig(f'static/img/{current_user.name}.png', dpi=200)
     return redirect(f'/personal_account/{name}')
 
 
