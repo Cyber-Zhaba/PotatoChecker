@@ -12,7 +12,7 @@ def abort_feedback_not_found(index: int) -> None:
         abort(404, messsage="Feedback wasn't found")
 
 
-class SitesResource(Resource):
+class FeedbackResource(Resource):
     def __init__(self) -> None:
         """Create sqldb parser"""
         self.parser = reqparse.RequestParser()
@@ -39,7 +39,7 @@ class SitesResource(Resource):
         return jsonify({'success': 'OK'})
 
 
-class ListSites(Resource):
+class FeedbackListResource(Resource):
     def __init__(self) -> None:
         """Create sqldb parser"""
         self.parser = reqparse.RequestParser()

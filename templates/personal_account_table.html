@@ -34,7 +34,7 @@
     <tr class="table_favourite">
         <th scope="row" style="color: #C5E70D">{{ loop.index }}</th>
         <td><a class="table_favourite" style="font-size: 2rem; color: #C5E70D;" href="/draw_graphic/{{favourite_website.id}}">{{favourite_website.name}}</a></td>
-        <td><a style="color: #C5E70D; font-size: 1.5rem"> {{favourite_website.state}}</a></td>
+        <td><a style="color: #C5E70D; font-size: 1.5rem"> {{ favourite_website['state'] }}</a></td>
     </tr>
     {% endfor %}
 
@@ -42,7 +42,7 @@
     <tr>
         <th scope="row">{{ loop.index + length }}</th>
         <td><a style="font-size: 2rem; color: white"  href="/draw_graphic/{{not_favourite_website.id}}">{{not_favourite_website.name}}</a></td>
-        <td style="font-size: 1.5rem;">{{not_favourite_website.state}}</td>
+        <td style="font-size: 1.5rem;">{{ not_favourite_website['state'] }}</td>
     </tr>
     {% endfor %}
     </tbody>
