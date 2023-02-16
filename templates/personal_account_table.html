@@ -48,10 +48,10 @@
 
     {% for not_favourite_website in not_favourite_sites %}
     <tr>
-        <th scope="row">{{ loop.index + length }}</th>
-        <td><a style="font-size: 2rem; color: white" href="/draw_graphic/{{not_favourite_website.id}}">{{not_favourite_website.name}}</a>
+        <th scope="row" width="50">{{ loop.index + length }}</th>
+        <td width="300"><a style="font-size: 2rem; color: white" href="/draw_graphic/{{not_favourite_website.id}}">{{not_favourite_website.name}}</a>
         </td>
-        <td style="font-size: 1.5rem;">{{not_favourite_website.state}}</td>
+        <td width="100" style="font-size: 1.5rem;">{{not_favourite_website.state}}</td>
     </tr>
     {% endfor %}
     </tbody>
