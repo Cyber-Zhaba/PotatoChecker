@@ -1,10 +1,12 @@
 import asyncio
+import datetime
 import subprocess
 import chardet
 from data.sites import Sites
 from data import db_session
 
-websites = [[i, db_session.query(Sites).filter(Sites.id == i).link] for i in db_session.query(Sites)]
+db_sess = db_session.create_session()
+websites = [[i, db_sess.query(Sites).filter(Sites.id == i).link] for i in db_sess.query(Sites)]
 
 
 async def ping_website(website):
@@ -26,13 +28,19 @@ async def run_pings():
             result = chardet.detect(site_ping)
             decoded = site_ping.decode(result['encoding'])
             result_ping = decoded.split("\r\n")[-2].split(',')[-1].split(' = ')[-1].split()[0]
+            db_sess = db_session.create_session()
             site = Sites(
                 id=res_id,
-                ping=result_ping
+                link=db_sess.query(Sites).filter(Sites.id == res_id).link,
+                owner_id=db_sess.query(Sites).filter(Sites.id == res_id).owner_id,
+                ping=result_ping,
+                check_time=datetime.now(),
+                description=db_sess.query(Sites).filter(Sites.id == res_id).description,
+                ids_feedbacks=db_sess.query(Sites).filter(Sites.id == res_id).ids_feedbacks
             )
-            db_session.add(site)
-            db_session.commit()
+            db_sess.add(site)
+            db_sess.commit()
         await asyncio.sleep(120)  # ждем 2 минуты перед повторной проверкой
 
 
-asyncio.run(run_pings())
+asyncio.run(run_pings()) #запуск тестиорования сайтов перекинуть в main

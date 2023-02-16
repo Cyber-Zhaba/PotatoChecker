@@ -20,6 +20,7 @@ class SitesResource(Resource):
         self.parser.add_argument('link', required=True)
         self.parser.add_argument('description', required=True)
         self.parser.add_argument('ping', required=True)
+        self.parser.add_argument('check_time')
         self.parser.add_argument('ids_feedback', required=True)
 
     @staticmethod
@@ -49,6 +50,7 @@ class ListSites(Resource):
         self.parser.add_argument('link', required=True)
         self.parser.add_argument('description', required=True)
         self.parser.add_argument('ping', required=True)
+        self.parser.add_argument('check_time', required=True)
         self.parser.add_argument('ids_feedback', required=True)
 
     @staticmethod
@@ -69,6 +71,7 @@ class ListSites(Resource):
             link=args['link'],
             description=args['description'],
             ping=args['ping'],
+            check_time=args['check_time'],
             ids_feedbacks=args['ids_feedbacks'],
         )
         session.add(sites)
