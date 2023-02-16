@@ -2,16 +2,18 @@ import matplotlib.pyplot as plt
 from flask import Flask, request
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
-from flask_restful import Api
+from flask_restful import Api, abort
 from data.users_resource import UsersResource, UsersListResource
 from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
-from requests import get, post
+from requests import get, post, put, delete
 from gevent.pywsgi import WSGIServer
 from gevent import monkey
 from data import db_session
 from data.users import User
+from data.sites import Sites
 from forms.registration_forms import RegisterForm, LoginForm
+from forms.add_website_forms import AddWebsiteForm
 from forms.util_forms import NameWebSiteForm
 
 monkey.patch_all()
@@ -183,6 +185,72 @@ def draw_graphic(website_id):
     ax.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
     fig.savefig(f'static/img/{current_user.name}.png', dpi=200)
     return redirect(f'/personal_account/{name}')
+
+
+@app.route('/add_website', methods=['GET', 'POST'])
+def add_website():
+    if request.method == 'GET':
+        form = AddWebsiteForm()
+        return render_template('Add_website.html', title='Добавление нового сайта', form=form)
+
+    elif request.method == 'POST':
+        form = AddWebsiteForm()
+        if form.validate_on_submit():
+            session = db_session.create_session()
+            if '.' not in form.link.data:
+                return render_template('Add_website.html', title='Добавление нового сайта', form=form,
+                                       message="Адресс сайта указан некоректно")
+
+            name = form.name.data
+            link = form.link.data.split('.')[0].split('/')[-1] + '.' + form.link.data.split('.')[1].split('/')[0]
+            # Это работает при условии, что в базе данныых мы храним линки сайтов без проотколов,
+            # т. е. https://yandex.ru/images/ -> yandex.ru
+
+            if session.query(Sites).filter(Sites.link == link).first():
+                return render_template('Add_website.html', title='Добавление нового сайта', form=form,
+                                       message="Этот сайт уже существует")
+
+            post('http://localhost:5000/api/sites',
+                 json={
+                     'type': 'post',
+                     'owner_id': current_user.id,
+                     'name': name,
+                     'link': link
+                 })
+
+            return 'Ваш запрос был отправлен на модерацию'  # Переделать!!!
+
+        return render_template('Add_website.html', title='Добавление нового сайта', form=form)
+
+
+@app.route('/moderation')
+def moderation():
+    if current_user.id != 1:
+        abort(403)
+    sites = get('http://localhost:5000/api/sites',
+                json={
+                    'type': 'to_moderation'
+                }).json()
+    return render_template('moderation.html',
+                           sites=sites['sites'])
+
+
+@app.route('/accept/<int:website_id>', methods=['GET', 'PUT'])
+def accept_website(website_id):
+    if current_user.id != 1:
+        abort(403)
+    put(f'http://localhost:5000/api/sites/{website_id}', json={'moderated': 1})
+    return redirect('/moderation')
+
+
+@app.route('/decline/<int:website_id>', methods=['GET', 'DEL'])
+def decline_website(website_id):
+    if current_user.id != 1:
+        abort(403)
+    delete(f'http://localhost:5000/api/sites/{website_id}')
+    # send_email()
+    # send_tellegram_message()
+    return redirect('/moderation')
 
 
 if __name__ == '__main__':
