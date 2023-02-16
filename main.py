@@ -10,6 +10,8 @@ from data.users_resource import UsersResource,UsersListResource
 from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
 from requests import get, post, delete
+from forms.registration_forms import RegisterForm, LoginForm
+from forms.util_forms import NameWebSiteForm
 
 import PIL
 
@@ -70,7 +72,7 @@ def about_page():
 
 @app.route('/account')
 def account_page():
-    return redirect('/personal_account/&&%%')
+    return redirect('/personal_account')
 
 
 @app.route('/logout')
@@ -92,6 +94,7 @@ def register():
     if request.method == 'GET':
         form = RegisterForm()
         return render_template('Register.html', title='signup', form=form)
+
     elif request.method == 'POST':
         form = RegisterForm()
         if form.validate_on_submit():
@@ -112,8 +115,8 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
     if request.method == 'GET':
-        form = LoginForm()
         return render_template('Login.html', form=form)
 
     elif request.method == 'POST':
@@ -123,68 +126,80 @@ def login():
             user = session.query(User).filter(User.username == form.username.data).first()
             if user and user.check_password(form.password.data):
                 login_user(user, remember=form.remember_me.data)
-                return redirect("/personal_account/&&%%", 301)
+                return redirect("/personal_account", 301)
             return render_template('Login.html', message="Неправильный логин или пароль", form=form)
         return render_template('Login.html', form=form)
 
 
 @login_required
-@app.route('/personal_account/<string:search>', methods=['GET'])
+@app.route('/<search>', defaults={'search': None})
+@app.route('/personal_account/<string:search>', methods=['GET', 'POST'])
 def personal_account(search):
-    if request.method == 'GET':
-        try:
-            if search == '&&%%':
-                favourite_sites_names = get('http://localhost:5000/api/sites',
+    form = NameWebSiteForm()
+    image_name = None
+    if request.method == 'POST':
+        search = form.name.data
+    else:
+        image_name = f'{current_user.name}.png'
+
+    try:
+        if search is None:
+            favourite_sites_names = get('http://localhost:5000/api/sites',
+                                        json={
+                                            'type': 'favourite_sites',
+                                            'favourite_sites': current_user.favourite_sites
+                                        }).json()
+            not_favourite_sites_names = get('http://localhost:5000/api/sites',
                                             json={
-                                                'type': 'favourite_sites',
+                                                'type': 'not_favourite_sites',
                                                 'favourite_sites': current_user.favourite_sites
                                             }).json()
-                not_favourite_sites_names = get('http://localhost:5000/api/sites',
-                                                json={
-                                                    'type': 'not_favourite_sites',
-                                                    'favourite_sites': current_user.favourite_sites
-                                                }).json()
-                image_name = 'x'
-            else:
-                favourite_sites_names = get('http://localhost:5000/api/sites',
+        else:
+            favourite_sites_names = get('http://localhost:5000/api/sites',
+                                        json={
+                                            'type': 'favourite_sites_and_name',
+                                            'favourite_sites': current_user.favourite_sites,
+                                            'name': search
+                                        }).json()
+            not_favourite_sites_names = get('http://localhost:5000/api/sites',
                                             json={
-                                                'type': 'favourite_sites_and_name',
+                                                'type': 'not_favourite_sites_and_name',
                                                 'favourite_sites': current_user.favourite_sites,
                                                 'name': search
                                             }).json()
+
+        return render_template('personal_account_table.html',
+                               favourite_sites=favourite_sites_names['sites'],
+                               not_favourite_sites=not_favourite_sites_names['sites'],
+                               length=len(favourite_sites_names['sites']),
+                               image_name=image_name,
+                               form=form)
+    except Exception as error:
+        if 'split' in error.__str__():
+            image_name = None
+            if request.method == 'POST':
+                search = form.name.data
+            else:
+                image_name = f'{current_user.name}.png'
+
+            if search is None:
                 not_favourite_sites_names = get('http://localhost:5000/api/sites',
                                                 json={
-                                                    'type': 'not_favourite_sites_and_name',
-                                                    'favourite_sites': current_user.favourite_sites,
+                                                    'type': 'all'
+                                                })
+            else:
+                not_favourite_sites_names = get('http://localhost:5000/api/sites',
+                                                json={
                                                     'name': search
-                                                }).json()
+                                                })
                 image_name = f'{current_user.name}.png'
             return render_template('personal_account_table.html',
-                                   favourite_sites=favourite_sites_names['sites'],
-                                   not_favourite_sites=not_favourite_sites_names['sites'],
-                                   length=len(favourite_sites_names['sites']),
+                                   favourite_sites=[],
+                                   not_favourite_sites=not_favourite_sites_names,
+                                   length=0,
                                    image_name=image_name)
-        except Exception as error:
-            if 'split' in error.__str__():
-                if search == '&&%%':
-                    not_favourite_sites_names = get('http://localhost:5000/api/sites',
-                                                    json={
-                                                        'type': 'all'
-                                                    })
-                    image_name = f'x'
-                else:
-                    not_favourite_sites_names = get('http://localhost:5000/api/sites',
-                                                    json={
-                                                        'name': search
-                                                    })
-                    image_name = f'{current_user.name}.png'
-                return render_template('personal_account_table.html',
-                                       favourite_sites=[],
-                                       not_favourite_sites=not_favourite_sites_names,
-                                       length=0,
-                                       image_name=image_name)
-            else:
-                return redirect('/login')
+        else:
+            return redirect('/login')
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])

@@ -1,0 +1,17 @@
+<div class="u-expanded-width u-form u-form-1">
+    <form action="" method="post" style="background-color: transparent; padding: 8px;" class="finder">
+        {{ form.hidden_tag() }}
+      <div class="u-form-group u-label-top" style="flex: 1 1 auto;">
+          <div class="mb-3">
+            {{ form.name.label }}
+            <a class="u-border-1 u-input u-input-rectangle">{{ form.name(class="form-control") }}</a>
+            {% for error in form.name.errors %}
+              <div class="alert alert-danger" role="alert"> {
+                  { error }}
+              </div>
+            {% endfor %}
+          </div>
+      </div>
+      <button type="submit" id="submit" name="submit" value="Submit" class="btn btn-primary u-btn u-btn-round u-button-style u-hover-palette-1-dark-1 u-palette-1-base u-radius-22 u-btn-1" style="position: relative; left: 13px; top:22px;">Найти</button>
+    </form>
+</div>
