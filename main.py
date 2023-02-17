@@ -54,7 +54,8 @@ def personal():
 def home_page():
     return render_template('Home.html',
                            users_amount=len(get('http://localhost:5000/api/users').json()['users']),
-                           sites_amount=len(get('http://localhost:5000/api/sites', json={'type': 'all'}).json()['sites']))
+                           sites_amount=len(get('http://localhost:5000/api/sites',
+                                                json={'type': 'all'}).json()['sites']))
 
 
 @app.route('/about')
@@ -286,6 +287,8 @@ if __name__ == '__main__':
     api.add_resource(SitesResource, '/api/sites/<int:site_id>')
     api.add_resource(FeedbackListResource, '/api/feedback')
     api.add_resource(FeedbackResource, '/api/feedback/<int:feedback_id>')
+    api.add_resource(TelegramListResource, '/api/telegram')
+    api.add_resource(TelegramResource, '/api/telegram/<int:user_id>')
     db_session.global_init("data/data.db")
 
     http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
