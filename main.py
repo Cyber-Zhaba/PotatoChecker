@@ -6,6 +6,7 @@ from flask_restful import Api, abort
 from data.users_resource import UsersResource, UsersListResource
 from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
+from data.telegram_resource import TelegramResource, TelegramListResource
 from requests import get, post, put, delete
 from gevent.pywsgi import WSGIServer
 from gevent import monkey
@@ -35,6 +36,9 @@ def main():
     api.add_resource(SitesResource, '/api/sites/<int:site_id>')
     api.add_resource(FeedbackListResource, '/api/feedback')
     api.add_resource(FeedbackResource, '/api/feedback/<int:feedback_id>')
+    api.add_resource(TelegramListResource, '/api/telegram')
+    api.add_resource(TelegramResource, '/api/telegram/<int:user_id>')
+
     db_session.global_init("data/data.db")
 
     http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
