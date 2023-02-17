@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <h1>{{ title }}</h1>
+    <form action="" enctype=multipart/form-data method="post">
+        {{ form.hidden_tag() }}
+        {{ form.name.label }}
+        {{ form.name(class="form-control", type="name") }}
+        {{ form.link.label }}
+        {{ form.link(class="form-control", type="link") }}
+        {{ message }}
+        <button type="submit" id="submit" name="submit" value="Submit" class="btn btn-primary">Добавить сайт</button>
+    </form>
+</head>
+<body>
+
+</body>
+</html>

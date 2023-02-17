@@ -1,0 +1,55 @@
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>{{ title }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap"
+      rel="stylesheet">
+<style>
+    table {
+        border-radius: 25px;
+        background-color: transparent;
+    }
+    a:link {
+      color: black;
+      background-color: transparent;
+      text-decoration: none;
+    }
+    thead, tbody { display: block; }
+
+    tbody {
+        height: 350px;
+        weight: 100px
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+</style>
+<body>
+<table width="100%">
+    <thead>
+    <tr>
+        <th scope="col" width="50" max-width="50">#</th>
+        <th scope="col" width="100" max-width="100">ID пользователя, который добавил сайт</th>
+        <th scope="col" width="300" max-width="300">Название сайта</th>
+        <th scope="col" width="300" max-width="300">Ссылка</th>
+        <th scope="col" width="300" max-width="300">Принять</th>
+        <th scope="col" width="300" max-width="300">Отклонить</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for website in sites %}
+    <tr class="table_favourite">
+        <th scope="row" style="color: #C5E70D" width="50">{{ loop.index }}</th>
+
+        <th scope="col" width="100">{{ website['owner_id'] }}</th>
+        <th scope="col" width="300">{{ website['name'] }}</th>
+        <th scope="col" width="300">{{ website['link'] }}</th>
+        <th scope="col" width="300"><a class="table_favourite" style="font-size: 2rem; color: #C5E70D;" href="/accept/{{ website['id'] }}">Принять</a></th>
+        <th scope="col" width="300"><a class="table_favourite" style="font-size: 2rem; color: #C5E70D;" href="/decline/{{ website['id'] }}">Отклонить</a></th>
+
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
