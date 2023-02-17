@@ -208,6 +208,7 @@ def add_website():
 
 @app.route('/moderation')
 def moderation():
+    # TODO design for moderation page
     """Moderation page(only admin)"""
     if current_user.id != 1:
         abort(403)
@@ -248,6 +249,7 @@ def add_to_favourite(website_name):
                            'name': website_name,
                            'favourite_sites': current_user.favourite_sites})
     website_id = website_id.json()['not_favourite_sites']
+    # TODO check multiply addition
     if website_id:
         website_id = website_id[0]['id']
         put(f'http://localhost:5000/api/users/{current_user.id}',
@@ -270,6 +272,7 @@ def delete_from_favourites(website_name):
                            'favourite_sites': current_user.favourite_sites})
     website_id = website_id.json()['favourite_sites']
     if website_id:
+        # TODO multiply deletion
         website_id = website_id[0]['id']
         put(f'http://localhost:5000/api/users/{current_user.id}',
             json={
