@@ -113,6 +113,7 @@ class SitesListResource(Resource):
             owner_id=args['owner_id'],
             name=args['name'],
             link=args['link'],
+            ids_feedbacks='',
             moderated=0
         )
         session.add(sites)
