@@ -13,7 +13,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     username = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String,
-                              unique=True, nullable=True)
+                              unique=False, nullable=True)
 
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     favourite_sites = sqlalchemy.Column(sqlalchemy.String, nullable=True)

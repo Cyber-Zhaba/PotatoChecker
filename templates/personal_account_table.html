@@ -18,31 +18,40 @@
       background-color: transparent;
       text-decoration: none;
     }
+    thead, tbody { display: block; }
 
+    tbody {
+        height: 350px;
+        weight: 100px
+        overflow-y: auto;
+        overflow-x: auto;
+    }
 </style>
 <body>
-<table width="100%" height="100%">
+<table width="100%">
     <thead>
     <tr>
-        <th scope="col">#</th>
-        <th scope="col">Название сайта</th>
-        <th scope="col">Состояние</th>
+        <th scope="col" width="50" max-width="50">#</th>
+        <th scope="col" width="300" max-width="300">Название сайта</th>
+        <th scope="col" width="100" max-width="100">Состояние</th>
     </tr>
     </thead>
     <tbody>
     {% for favourite_website in favourite_sites %}
     <tr class="table_favourite">
-        <th scope="row" style="color: #C5E70D">{{ loop.index }}</th>
-        <td><a class="table_favourite" style="font-size: 2rem; color: #C5E70D;" href="/draw_graphic/{{favourite_website.id}}">{{favourite_website.name}}</a></td>
-        <td><a style="color: #C5E70D; font-size: 1.5rem"> {{favourite_website.state}}</a></td>
+        <th scope="row" style="color: #C5E70D" width="50">{{ loop.index }}</th>
+        <td width="300"><a class="table_favourite" style="font-size: 2rem; color: #C5E70D;"
+                                href="/draw_graphic/{{favourite_website.id}}">{{favourite_website.name}}</a></td>
+        <td width="100"><a style="color: #C5E70D; font-size: 1.5rem"> {{favourite_website.state}}</a></td>
     </tr>
     {% endfor %}
 
     {% for not_favourite_website in not_favourite_sites %}
     <tr>
-        <th scope="row">{{ loop.index + length }}</th>
-        <td><a style="font-size: 2rem; color: white"  href="/draw_graphic/{{not_favourite_website.id}}">{{not_favourite_website.name}}</a></td>
-        <td style="font-size: 1.5rem;">{{not_favourite_website.state}}</td>
+        <th scope="row" width="50">{{ loop.index + length }}</th>
+        <td width="300"><a style="font-size: 2rem; color: white" href="/draw_graphic/{{not_favourite_website.id}}">{{not_favourite_website.name}}</a>
+        </td>
+        <td width="100" style="font-size: 1.5rem;">{{not_favourite_website.state}}</td>
     </tr>
     {% endfor %}
     </tbody>

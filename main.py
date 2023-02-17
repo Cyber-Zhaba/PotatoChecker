@@ -1,18 +1,22 @@
-import os
-
 import matplotlib.pyplot as plt
-from flask import make_response
 from flask import Flask, request
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
-from flask_restful import Api
-
+from flask_restful import Api, abort
+from data.users_resource import UsersResource, UsersListResource
+from data.sites_resource import SitesResource, SitesListResource
+from data.feedback_resource import FeedbackResource, FeedbackListResource
+from requests import get, post, put, delete
+from gevent.pywsgi import WSGIServer
+from gevent import monkey
 from data import db_session
-from data.sites import Sites
 from data.users import User
-
+from data.sites import Sites
 from forms.registration_forms import RegisterForm, LoginForm
+from forms.add_website_forms import AddWebsiteForm
+from forms.util_forms import NameWebSiteForm
 
+monkey.patch_all()
 UPLOAD_FOLDER = '/static/img'
 app = Flask(__name__)
 api = Api(app)
@@ -22,15 +26,25 @@ login_manager = LoginManager(app)
 login_manager.init_app(app)
 
 
-# old vers no api TODO: add API!!!
-
 def main():
-    db_session.global_init("data/data.db")
-    # api.add_resource(users_resource.UsersListResource, '/api/v2/users')
-    # api.add_resource(users_resource.UsersResource, '/api/v2/users/<int:user_id>')
+    api = Api(app)
 
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    api.add_resource(UsersListResource, '/api/users')
+    api.add_resource(UsersResource, '/api/users/<int:user_id>')
+    api.add_resource(SitesListResource, '/api/sites')
+    api.add_resource(SitesResource, '/api/sites/<int:site_id>')
+    api.add_resource(FeedbackListResource, '/api/feedback')
+    api.add_resource(FeedbackResource, '/api/feedback/<int:feedback_id>')
+    db_session.global_init("data/data.db")
+
+    http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
+    http.serve_forever()
+
+
+@app.errorhandler(401)
+def log_redirect(error):
+    print(error)
+    return redirect('/login')
 
 
 @app.route('/About.html')
@@ -60,7 +74,7 @@ def about_page():
 
 @app.route('/account')
 def account_page():
-    return redirect('/personal_account/&&%%')
+    return redirect('/personal_account')
 
 
 @app.route('/logout')
@@ -86,17 +100,16 @@ def register():
     elif request.method == 'POST':
         form = RegisterForm()
         if form.validate_on_submit():
-            db_sess = db_session.create_session()
-            if db_sess.query(User).filter(User.username == form.username.data).first():
+            session = db_session.create_session()
+            if session.query(User).filter(User.username == form.username.data).first():
                 return render_template('Register.html', form=form, message="Этот логин уже существует")
-            user = User(
-                username=form.username.data,
-                name=form.username.data,
-                email=form.email.data
-            )
-            user.set_password(form.password.data)
-            db_sess.add(user)
-            db_sess.commit()
+            post('http://localhost:5000/api/users', json={
+                'username': form.username.data,
+                'name': form.name.data,
+                'email': form.email.data,
+                'password': form.password.data
+            })
+            user = session.query(User).filter(User.username == form.username.data).first()
             login_user(user, remember=form.remember_me.data)
             return redirect("/", 301)
         return render_template('Register.html', form=form)
@@ -104,54 +117,50 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
     if request.method == 'GET':
-        form = LoginForm()
         return render_template('Login.html', form=form)
 
     elif request.method == 'POST':
         form = LoginForm()
         if form.validate_on_submit():
-            db_sess = db_session.create_session()
-            user = db_sess.query(User).filter(User.username == form.username.data).first()
+            session = db_session.create_session()
+            user = session.query(User).filter(User.username == form.username.data).first()
             if user and user.check_password(form.password.data):
                 login_user(user, remember=form.remember_me.data)
-                return redirect("/personal_account/&&%%", 301)
+                return redirect("/personal_account", 301)
             return render_template('Login.html', message="Неправильный логин или пароль", form=form)
         return render_template('Login.html', form=form)
 
 
+@app.route('/<search>', defaults={'search': None}, methods=['GET', 'POST'])
+@app.route('/personal_account/<string:search>', methods=['GET', 'POST'])
 @login_required
-@app.route('/personal_account/<string:search>', methods=['GET'])
 def personal_account(search):
-    if request.method == 'GET':
-        try:
-            db_sess = db_session.create_session()
-            if search == '&&%%':
-                favourite_sites_names = db_sess.query(Sites).filter(
-                    Sites.id.in_(current_user.favourite_sites.split(','))).all()
-                not_favourite_sites_names = db_sess.query(Sites).filter(
-                    ~ (Sites.id.in_(current_user.favourite_sites.split(',')))).all()
-                image_name = 'x'
-            else:
-                favourite_sites_names = db_sess.query(Sites).filter(
-                    Sites.name.contains(search), Sites.id.in_(current_user.favourite_sites.split(','))).all()
-                not_favourite_sites_names = db_sess.query(Sites).filter(
-                    Sites.name.contains(search), ~(Sites.id.in_(current_user.favourite_sites.split(',')))).all()
-                image_name = f'{current_user.name}.png'
-            return render_template('personal_account_table.html',
-                                   favourite_sites=favourite_sites_names,
-                                   not_favourite_sites=not_favourite_sites_names,
-                                   length=len(favourite_sites_names),
-                                   image_name=image_name)
-        except Exception as error:
-            if 'split' in error.__str__():
-                return render_template('personal_account_table.html',
-                                       favourite_sites=[],
-                                       not_favourite_sites=[],
-                                       length=0,
-                                       image_name=f'x')
-            else:
-                return redirect('/login')
+    form = NameWebSiteForm()
+    image_name = f'{current_user.name}.png'
+    if request.method == 'POST':
+        search = form.name.data
+        image_name = None
+    if search is None:
+        image_name = None
+        answer = get('http://localhost:5000/api/sites',
+                     json={'type': 'all_by_groups',
+                           'favourite_sites': current_user.favourite_sites}).json()
+    else:
+        answer = get('http://localhost:5000/api/sites',
+                     json={'type': 'sites_by_name',
+                           'name': search,
+                           'favourite_sites': current_user.favourite_sites}).json()
+    favourite_sites_names = answer['favourite_sites']
+    not_favourite_sites_names = answer['not_favourite_sites']
+    return render_template('personal_account_table.html',
+                           favourite_sites=favourite_sites_names,
+                           not_favourite_sites=not_favourite_sites_names,
+                           length=len(favourite_sites_names),
+                           image_name=image_name,
+                           form=form,
+                           description="Visit our GayWebsite.com")
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
@@ -159,20 +168,89 @@ def draw_graphic(website_id):
     time = range(1, 9)
     reports = [0, 0, 1, 3, 0, 5, 4, 5]
     db_sess = db_session.create_session()
-    name = db_sess.query(Sites).filter(Sites.id.in_([website_id])).all()[0].name
+    name = get(f'http://localhost:5000/api/sites/{website_id}').json()['sites']['name']
     plt.plot(time, reports)
     fig, ax = plt.subplots(facecolor='#21024c')
+    ax.set_title(name.upper(), color='white', size='20')
     ax.set_facecolor(color='#21024c')
     ax.plot(reports, color='#0f497f')
     ax.tick_params(axis='both', colors='white')
+    ax.set_xlabel('Часы', color='white', size='13')
+    ax.set_ylabel('Количество жалоб', color='white', size='13')
     ax.spines['left'].set_color('white')
     ax.spines['bottom'].set_color('white')
     ax.spines['right'].set_color('#21024c')
     ax.spines['top'].set_color('#21024c')
     ax.grid(True)
     ax.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
-    fig.savefig(f'static/img/{current_user.name}.png', dpi=500)
+    fig.savefig(f'static/img/{current_user.name}.png', dpi=200)
     return redirect(f'/personal_account/{name}')
+
+
+@app.route('/add_website', methods=['GET', 'POST'])
+def add_website():
+    if request.method == 'GET':
+        form = AddWebsiteForm()
+        return render_template('Add_website.html', title='Добавление нового сайта', form=form)
+
+    elif request.method == 'POST':
+        form = AddWebsiteForm()
+        if form.validate_on_submit():
+            session = db_session.create_session()
+            if '.' not in form.link.data:
+                return render_template('Add_website.html', title='Добавление нового сайта', form=form,
+                                       message="Адресс сайта указан некоректно")
+
+            name = form.name.data
+            link = form.link.data.split('.')[0].split('/')[-1] + '.' + form.link.data.split('.')[1].split('/')[0]
+            # Это работает при условии, что в базе данныых мы храним линки сайтов без проотколов,
+            # т. е. https://yandex.ru/images/ -> yandex.ru
+
+            if session.query(Sites).filter(Sites.link == link).first():
+                return render_template('Add_website.html', title='Добавление нового сайта', form=form,
+                                       message="Этот сайт уже существует")
+
+            post('http://localhost:5000/api/sites',
+                 json={
+                     'type': 'post',
+                     'owner_id': current_user.id,
+                     'name': name,
+                     'link': link
+                 })
+
+            return 'Ваш запрос был отправлен на модерацию'  # Переделать!!!
+
+        return render_template('Add_website.html', title='Добавление нового сайта', form=form)
+
+
+@app.route('/moderation')
+def moderation():
+    if current_user.id != 1:
+        abort(403)
+    sites = get('http://localhost:5000/api/sites',
+                json={
+                    'type': 'to_moderation'
+                }).json()
+    return render_template('moderation.html',
+                           sites=sites['sites'])
+
+
+@app.route('/accept/<int:website_id>', methods=['GET', 'PUT'])
+def accept_website(website_id):
+    if current_user.id != 1:
+        abort(403)
+    put(f'http://localhost:5000/api/sites/{website_id}', json={'moderated': 1})
+    return redirect('/moderation')
+
+
+@app.route('/decline/<int:website_id>', methods=['GET', 'DEL'])
+def decline_website(website_id):
+    if current_user.id != 1:
+        abort(403)
+    delete(f'http://localhost:5000/api/sites/{website_id}')
+    # send_email()
+    # send_tellegram_message()
+    return redirect('/moderation')
 
 
 if __name__ == '__main__':
