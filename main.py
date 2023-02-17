@@ -6,13 +6,16 @@ from flask_restful import Api
 from data.users_resource import UsersResource, UsersListResource
 from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
+from data.feedbacks import Feedbacks
 from requests import get, post
 from gevent.pywsgi import WSGIServer
 from gevent import monkey
 from data import db_session
 from data.users import User
 from forms.registration_forms import RegisterForm, LoginForm
+from forms.comment_form import CommentForm
 from forms.util_forms import NameWebSiteForm
+from data.sites import Sites
 
 monkey.patch_all()
 UPLOAD_FOLDER = '/static/img'
@@ -136,10 +139,30 @@ def login():
 @login_required
 def personal_account(search):
     form = NameWebSiteForm()
+    form_2 = CommentForm()
     image_name = f'{current_user.name}.png'
+    feedbacks = []
     if request.method == 'POST':
-        search = form.name.data
-        image_name = None
+        if form.validate_on_submit():
+            search = form.name.data
+            form_2.content.data = ''
+            image_name = None
+        if form_2.validate_on_submit():
+            if form_2.content.data != '':
+                db_sess = db_session.create_session()
+                site = db_sess.query(Sites).filter(Sites.name == search).first()
+                form.name.data = search
+                feedback = Feedbacks(
+                    content=form_2.content.data,
+                    owner_id=current_user.id)
+                db_sess.add(feedback)
+                feedback = db_sess.query(Feedbacks).all()[-1].id
+                if str(site.ids_feedbacks) == 'None':
+                    site.ids_feedbacks = str(feedback) + ','
+                else:
+                    site.ids_feedbacks = site.ids_feedbacks + str(feedback) + ','
+                db_sess.commit()
+                form_2.content.data = ''
     if search is None:
         image_name = None
         answer = get('http://localhost:5000/api/sites',
@@ -152,13 +175,29 @@ def personal_account(search):
                            'favourite_sites': current_user.favourite_sites}).json()
     favourite_sites_names = answer['favourite_sites']
     not_favourite_sites_names = answer['not_favourite_sites']
+    db_sess = db_session.create_session()
+    site = db_sess.query(Sites).filter(Sites.name == search).first()
+    if str(site) != 'None' and site.ids_feedbacks != '':
+        feedbacks = db_sess.query(Feedbacks).filter(
+            Feedbacks.id.in_(list(map(int, site.ids_feedbacks[:-1].split(','))))).all()
+    else:
+        feedbacks = []
+    users = {}
+    for i in feedbacks:
+        users[i.id] = db_sess.query(User).filter(User.id == i.owner_id).first().name
+    print(users)
+    db_sess.commit()
     return render_template('personal_account_table.html',
                            favourite_sites=favourite_sites_names,
                            not_favourite_sites=not_favourite_sites_names,
                            length=len(favourite_sites_names),
                            image_name=image_name,
                            form=form,
-                           description="Visit our GayWebsite.com")
+                           form_2=form_2,
+                           description="Visit our GayWebsite.com",
+                           feedbacks=feedbacks,
+                           users=users
+                           )
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
