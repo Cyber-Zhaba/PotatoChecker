@@ -13,6 +13,7 @@ from data.sites import Sites
 from data.users_resource import UsersResource, UsersListResource
 from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
+from data.telegram_resource import TelegramResource, TelegramListResource
 from forms.registration_forms import RegisterForm, LoginForm
 from forms.add_website_forms import AddWebsiteForm
 from forms.util_forms import NameWebSiteForm
@@ -51,7 +52,9 @@ def personal():
 
 @app.route('/')
 def home_page():
-    return render_template('Home.html')
+    return render_template('Home.html',
+                           users_amount=len(get('http://localhost:5000/api/users').json()['users']),
+                           sites_amount=len(get('http://localhost:5000/api/sites', json={'type': 'all'}).json()['sites']))
 
 
 @app.route('/about')
