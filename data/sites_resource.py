@@ -51,10 +51,8 @@ class SitesResource(Resource):
         site = session.query(Sites).get(site_id)
 
         setattr(site, 'moderated', 1)
-        session.commit()
 
         session.commit()
-        print(session.query(Sites).get(site_id).moderated)
         return jsonify({'success': 'OK'})
 
 
@@ -72,6 +70,7 @@ class SitesListResource(Resource):
     def get(self) -> Response:
         """API method get"""
         args = self.parser.parse_args()
+        result = jsonify({'status': 'Failed'})
         if args['favourite_sites'] is None:
             favourite = []
         else:
@@ -104,7 +103,9 @@ class SitesListResource(Resource):
             case 'to_moderation':
                 mod = self.session.query(Sites).filter(Sites.moderated == 0).all()
                 result = jsonify({'sites': [item.to_dict(rules=("-site", "-site")) for item in mod]})
-
+            case 'strict_name':
+                strict = self.session.query(Sites).filter(Sites.name == args['name'])
+                result = jsonify({'sites': [item.to_dict(only=('name', 'id', 'link', 'ids_feedbacks')) for item in strict]})
         return result
 
     def post(self) -> Response:
@@ -115,6 +116,7 @@ class SitesListResource(Resource):
             owner_id=args['owner_id'],
             name=args['name'],
             link=args['link'],
+            ids_feedbacks='',
             moderated=0
         )
         session.add(sites)

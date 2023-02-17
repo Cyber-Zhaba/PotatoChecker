@@ -80,10 +80,11 @@
             {{ form.password(class="form-control", type="password") }}
             {% for error in form.password.errors %} <div class="alert alert-danger" role="alert"> {{ error }} </div> {% endfor %} 
               </div>
+              </div> {% if message %} <div class="alert alert-danger d-grid" role="alert">{{message}}</div> {% endif %}
+
               <div class="mb-3"> {{ form.remember_me() }} {{ form.remember_me.label }} </div>
               <div class="d-grid">
                 <button type="submit" id="submit" name="submit" value="Submit" class="btn btn-primary">Зарегистрироваться</button>
-              </div> {% if message %} <div class="alert alert-danger d-grid" role="alert">{{message}}</div> {% endif %} 
             </div>
           </form>
         </div>
