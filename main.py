@@ -1,20 +1,24 @@
 """Flask main server file"""
 import matplotlib.pyplot as plt
+
 from flask import Flask, request
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_restful import Api, abort
+
 from requests import get, post, delete, put
-from gevent.pywsgi import WSGIServer
-from data.feedbacks import Feedbacks
 from gevent import monkey
+from gevent.pywsgi import WSGIServer
+
 from data import db_session
+from data.feedbacks import Feedbacks
 from data.users import User
 from data.sites import Sites
 from data.users_resource import UsersResource, UsersListResource
 from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
 from data.telegram_resource import TelegramResource, TelegramListResource
+
 from forms.registration_forms import RegisterForm, LoginForm
 from forms.comment_form import CommentForm
 from forms.add_website_forms import AddWebsiteForm
@@ -41,8 +45,10 @@ def log_redirect(error):
 def home_page():
     """Home page"""
     return render_template('Home.html',
-                           users_amount=len(get('http://localhost:5000/api/users').json()['users']),
+                           users_amount=len(get('http://localhost:5000/api/users',
+                                                timeout=(2, 20)).json()['users']),
                            sites_amount=len(get('http://localhost:5000/api/sites',
+                                                timeout=(2, 20),
                                                 json={'type': 'all'}).json()['sites']))
 
 
@@ -81,8 +87,8 @@ def register():
                     'username': form.username.data,
                     'name': form.name.data,
                     'email': form.email.data,
-                    'password': form.password.data
-                })
+                    'password': form.password.data},
+                     timeout=(2, 20))
                 user = session.query(User).filter(User.username == f'{form.username.data}').first()
                 login_user(user, remember=form.remember_me.data)
                 return redirect("/account", 301)
@@ -100,8 +106,7 @@ def login():
             if user and user.check_password(form.password.data):
                 login_user(user, remember=form.remember_me.data)
                 return redirect("/personal_account", 301)
-            else:
-                message = "Неправильный логин или пароль"
+            message = "Неправильный логин или пароль"
     return render_template('Login.html', form=form, message=message)
 
 
@@ -113,7 +118,6 @@ def personal_account(search):
     :var search: string, name of site to search"""
     form, form_2 = NameWebSiteForm(), CommentForm()
     feedbacks, users = [], {}
-
     image_name = f'{current_user.name}.png' if search is not None and request != 'POST' else None
     flag_finder = False
     if request.method == "POST":
@@ -142,7 +146,7 @@ def personal_account(search):
     else:
         req = {'type': 'sites_by_name', 'name': search,
                'favourite_sites': current_user.favourite_sites}
-    answer = get('http://localhost:5000/api/sites', json=req).json()
+    answer = get('http://localhost:5000/api/sites', json=req, timeout=(2, 20)).json()
 
     favourite_sites_names = answer['favourite_sites']
     not_favourite_sites_names = answer['not_favourite_sites']
@@ -150,7 +154,8 @@ def personal_account(search):
     if not flag_finder:
         answer = get('http://localhost:5000/api/sites',
                      json={'type': 'strict_name',
-                           'name': search}).json()['sites']
+                           'name': search},
+                     timeout=(2, 20)).json()['sites']
         if answer:
             site = answer[0]
             feedback = [feedback for feedback in site['ids_feedbacks'].split(',') if feedback]
@@ -178,21 +183,22 @@ def draw_graphic(website_id):
     :var website_id: int, id of site to plot"""
     time = range(1, 9)
     reports = [0, 0, 1, 3, 0, 5, 4, 5]
-    name = get(f'http://localhost:5000/api/sites/{website_id}').json()['sites']['name']
+    name = get(f'http://localhost:5000/api/sites/{website_id}',
+               timeout=(2, 20)).json()['sites']['name']
     plt.plot(time, reports)
-    fig, ax = plt.subplots(facecolor='#21024c')
-    ax.set_title(name.upper(), color='white', size='20')
-    ax.set_facecolor(color='#21024c')
-    ax.plot(reports, color='#0f497f')
-    ax.tick_params(axis='both', colors='white')
-    ax.set_xlabel('Часы', color='white', size='13')
-    ax.set_ylabel('Количество жалоб', color='white', size='13')
-    ax.spines['left'].set_color('white')
-    ax.spines['bottom'].set_color('white')
-    ax.spines['right'].set_color('#21024c')
-    ax.spines['top'].set_color('#21024c')
-    ax.grid(True)
-    ax.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
+    fig, axes = plt.subplots(facecolor='#21024c')
+    axes.set_title(name.upper(), color='white', size='20')
+    axes.set_facecolor(color='#21024c')
+    axes.plot(reports, color='#0f497f')
+    axes.tick_params(axis='both', colors='white')
+    axes.set_xlabel('Часы', color='white', size='13')
+    axes.set_ylabel('Количество жалоб', color='white', size='13')
+    axes.spines['left'].set_color('white')
+    axes.spines['bottom'].set_color('white')
+    axes.spines['right'].set_color('#21024c')
+    axes.spines['top'].set_color('#21024c')
+    axes.grid(True)
+    axes.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
     fig.savefig(f'static/img/{current_user.name}.png', dpi=200)
     return redirect(f'/personal_account/{name}')
 
@@ -218,11 +224,11 @@ def add_website():
                     message = "Этот сайт уже существует"
                 else:
                     post('http://localhost:5000/api/sites',
-                         json={
-                             'type': 'post',
-                             'owner_id': current_user.id,
-                             'name': name,
-                             'link': link})
+                         json={'type': 'post',
+                               'owner_id': current_user.id,
+                               'name': name,
+                               'link': link},
+                         timeout=(2, 20))
                     return 'Ваш запрос был отправлен на модерацию'
                     # TODO https://puzzleweb.ru/css/examples/21-5.php
     return render_template('Add_website.html', title=title, form=form, message=message)
@@ -235,7 +241,7 @@ def moderation():
     if current_user.id != 1:
         abort(403)
     sites = get('http://localhost:5000/api/sites',
-                json={'type': 'to_moderation'}).json()
+                json={'type': 'to_moderation'}, timeout=(2, 20)).json()
     return render_template('moderation.html', sites=sites['sites'])
 
 
@@ -246,7 +252,9 @@ def accept_website(website_id):
         :var website_id: int, id to accept"""
     if current_user.id != 1:
         abort(403)
-    put(f'http://localhost:5000/api/sites/{website_id}', json={'moderated': 1})
+    put(f'http://localhost:5000/api/sites/{website_id}',
+        json={'moderated': 1},
+        timeout=(2, 20))
     return redirect('/moderation')
 
 
@@ -257,7 +265,7 @@ def decline_website(website_id):
         :var website_id: int, id to decline and delete from base"""
     if current_user.id != 1:
         abort(403)
-    delete(f'http://localhost:5000/api/sites/{website_id}')
+    delete(f'http://localhost:5000/api/sites/{website_id}', timeout=(2, 20))
     return redirect('/moderation')
 
 
@@ -269,16 +277,16 @@ def add_to_favourite(website_name):
     website_id = get('http://localhost:5000/api/sites',
                      json={'type': 'sites_by_name',
                            'name': website_name,
-                           'favourite_sites': current_user.favourite_sites})
+                           'favourite_sites': current_user.favourite_sites},
+                     timeout=(2, 20))
     website_id = website_id.json()['not_favourite_sites']
     # TODO check multiply addition
     if website_id:
         website_id = website_id[0]['id']
         put(f'http://localhost:5000/api/users/{current_user.id}',
-            json={
-                'type': 'add',
-                'website': website_id
-            }).json()
+            json={'type': 'add',
+                  'website': website_id},
+            timeout=(2, 20)).json()
 
     return redirect(f'/personal_account/{website_name}')
 
@@ -291,16 +299,16 @@ def delete_from_favourites(website_name):
     website_id = get('http://localhost:5000/api/sites',
                      json={'type': 'sites_by_name',
                            'name': website_name,
-                           'favourite_sites': current_user.favourite_sites})
+                           'favourite_sites': current_user.favourite_sites},
+                     timeout=(2, 20))
     website_id = website_id.json()['favourite_sites']
     if website_id:
         # TODO multiply deletion
         website_id = website_id[0]['id']
         put(f'http://localhost:5000/api/users/{current_user.id}',
-            json={
-                'type': 'delete',
-                'website': website_id
-            }).json()
+            json={'type': 'delete',
+                  'website': website_id},
+            timeout=(2, 20)).json()
 
     return redirect(f'/personal_account/{website_name}')
 
