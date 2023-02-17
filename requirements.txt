@@ -11,3 +11,4 @@ chardet~=5.1.0
 matplotlib~=3.6.2
 Pillow~=9.3.0
 gevent~=22.10.2
+https://github.com/aiogram/aiogram/archive/refs/heads/dev-3.x.zip
