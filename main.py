@@ -1,5 +1,8 @@
 """Flask main server file"""
+import asyncio
+
 import matplotlib.pyplot as plt
+import schedule
 
 from flask import Flask, request
 from flask import render_template, redirect
@@ -313,7 +316,30 @@ def delete_from_favourites(website_name):
     return redirect(f'/personal_account/{website_name}')
 
 
-if __name__ == '__main__':
+async def repeat(interval, func, *args, **kwargs):
+    """Run func every interval seconds.
+
+    If func has not finished before *interval*, will run again
+    immediately when the previous iteration finished.
+
+    *args and **kwargs are passed as the arguments to func.
+    """
+    while True:
+        await asyncio.gather(
+            func(*args, **kwargs),
+            asyncio.sleep(interval))
+
+
+async def ping_all_sites():
+    await asyncio.sleep(0.01)
+    print('Hello')
+
+
+async def ping_handler():
+    await asyncio.ensure_future(repeat(3, ping_all_sites))
+
+
+async def flask_server():
     api.add_resource(UsersListResource, '/api/users')
     api.add_resource(UsersResource, '/api/users/<int:user_id>')
     api.add_resource(SitesListResource, '/api/sites')
@@ -323,6 +349,15 @@ if __name__ == '__main__':
     api.add_resource(TelegramListResource, '/api/telegram')
     api.add_resource(TelegramResource, '/api/telegram/<int:user_id>')
     db_session.global_init("data/data.db")
-
     http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
     http.serve_forever()
+    await flask_server
+
+
+if __name__ == '__main__':
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    tasks = [loop.create_task(flask_server()),
+             loop.create_task(ping_handler())]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
