@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
-from . import db_session
-from .users import User
+from data import db_session
+from data.users import User
 
 
 def abort_if_users_not_found(users_id: int) -> None:
@@ -45,7 +45,7 @@ class UsersResource(Resource):
         new_favourite = ''
         match args['type']:
             case 'add':
-                new_favourite = f"{user.favourite_sites} {args['website']}" if user.favourite_sites else args['website']
+                new_favourite = f"{user.favourite_sites},{args['website']}" if user.favourite_sites else args['website']
             case 'delete':
                 new_favourite = ','.join([item for item in filter(lambda x: x, user.favourite_sites.replace(
                     args['website'], '').split(','))])

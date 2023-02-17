@@ -15,7 +15,6 @@ from data.sites import Sites
 from forms.registration_forms import RegisterForm, LoginForm
 from forms.add_website_forms import AddWebsiteForm
 from forms.util_forms import NameWebSiteForm
-import os
 
 monkey.patch_all()
 UPLOAD_FOLDER = '/static/img'
@@ -264,12 +263,15 @@ def add_to_favourite(website_name):
     website_id = get('http://localhost:5000/api/sites',
                      json={'type': 'sites_by_name',
                            'name': website_name,
-                           'favourite_sites': current_user.favourite_sites}).json()['not_favourite_sites'][0]['id']
-    put(f'http://localhost:5000/api/users/{current_user.id}',
-        json={
-            'type': 'add',
-            'website': website_id
-        }).json()
+                           'favourite_sites': current_user.favourite_sites}).json()['not_favourite_sites']
+    if website_id:
+        website_id = website_id[0]['id']
+        put(f'http://localhost:5000/api/users/{current_user.id}',
+            json={
+                'type': 'add',
+                'website': website_id
+            }).json()
+
     return redirect(f'/personal_account/{website_name}')
 
 
@@ -279,12 +281,15 @@ def delete_from_favourites(website_name):
     website_id = get('http://localhost:5000/api/sites',
                      json={'type': 'sites_by_name',
                            'name': website_name,
-                           'favourite_sites': current_user.favourite_sites}).json()['favourite_sites'][0]['id']
-    put(f'http://localhost:5000/api/users/{current_user.id}',
-        json={
-            'type': 'delete',
-            'website': website_id
-        }).json()
+                           'favourite_sites': current_user.favourite_sites}).json()['favourite_sites']
+    if website_id:
+        website_id = website_id[0]['id']
+        put(f'http://localhost:5000/api/users/{current_user.id}',
+            json={
+                'type': 'delete',
+                'website': website_id
+            }).json()
+
     return redirect(f'/personal_account/{website_name}')
 
 

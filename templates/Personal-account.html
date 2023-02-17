@@ -54,25 +54,29 @@
       <div class="u-clearfix u-sheet u-sheet-1">
         <h1 class="u-align-center u-text u-text-default u-text-1">Личный кабинет<br>
         </h1>
-        <div class="u-clearfix u-expanded-width u-gutter-22 u-layout-wrap u-layout-wrap-1">
+        <div class="u-clearfix u-expanded-width u-gutter-18 u-layout-wrap u-layout-wrap-1">
           <div class="u-layout">
             <div class="u-layout-row">
               <div class="u-container-style u-layout-cell u-radius-25 u-shape-round u-size-30 u-layout-cell-1">
                 <div class="u-border-3 u-border-custom-color-4 u-container-layout u-container-layout-1">
-                  <div class="u-clearfix u-custom-html u-custom-html-1">{% include "block_search.html" %}
-                    {% block body %}
-                    {% endblock %}</div>
+                  <div class="u-clearfix u-custom-html u-custom-html-1">
+                      {% include "block_search.html" %}
+                      {% block body %}
+                      {% endblock %}
+                  </div>
                   <div class="u-clearfix u-custom-html u-preserve-proportions u-custom-html-2">
-                    <main role="main" class="container"> {% block content %}
-                    {% endblock %} </main>
+                    <main role="main" class="container">
+                        {% block content %}
+                        {% endblock %}
+                    </main>
                   </div>
                 </div>
               </div>
-              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-2">
+              <div class="u-container-style u-layout-cell u-radius-25 u-size-30 u-layout-cell-2">
                 <div class="u-border-3 u-border-custom-color-4 u-container-layout u-container-layout-2">
                   <div class="u-clearfix u-custom-html u-expanded u-custom-html-3">
                       {% if image_name is not none %}
-                        <img src="../static/img/{{image_name}}" width="99%" height="99%" alt="Plot">
+                        <img src="../static/img/{{image_name}}" width="99%" height="75%" alt="Plot" class="u-radius-25">
                       {% endif %}
                   </div>
                 </div>
