@@ -15,6 +15,7 @@ from data.sites import Sites
 from forms.registration_forms import RegisterForm, LoginForm
 from forms.add_website_forms import AddWebsiteForm
 from forms.util_forms import NameWebSiteForm
+import os
 
 monkey.patch_all()
 UPLOAD_FOLDER = '/static/img'
@@ -160,7 +161,8 @@ def personal_account(search):
                            length=len(favourite_sites_names),
                            image_name=image_name,
                            form=form,
-                           description="Visit our GayWebsite.com")
+                           description="Visit our GayWebsite.com",
+                           website_name=search)
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
@@ -188,6 +190,7 @@ def draw_graphic(website_id):
 
 
 @app.route('/add_website', methods=['GET', 'POST'])
+@login_required
 def add_website():
     if request.method == 'GET':
         form = AddWebsiteForm()
@@ -206,7 +209,7 @@ def add_website():
             # Это работает при условии, что в базе данныых мы храним линки сайтов без проотколов,
             # т. е. https://yandex.ru/images/ -> yandex.ru
 
-            if session.query(Sites).filter(Sites.link == link).first():
+            if session.query(Sites).filter(Sites.link == link | Sites.name == name).first():
                 return render_template('Add_website.html', title='Добавление нового сайта', form=form,
                                        message="Этот сайт уже существует")
 
@@ -236,6 +239,7 @@ def moderation():
 
 
 @app.route('/accept/<int:website_id>', methods=['GET', 'PUT'])
+@login_required
 def accept_website(website_id):
     if current_user.id != 1:
         abort(403)
@@ -244,6 +248,7 @@ def accept_website(website_id):
 
 
 @app.route('/decline/<int:website_id>', methods=['GET', 'DEL'])
+@login_required
 def decline_website(website_id):
     if current_user.id != 1:
         abort(403)
@@ -251,6 +256,36 @@ def decline_website(website_id):
     # send_email()
     # send_tellegram_message()
     return redirect('/moderation')
+
+
+@app.route('/add_to_favourites/<string:website_name>', methods=['GET', 'PUT'])
+@login_required
+def add_to_favourite(website_name):
+    website_id = get('http://localhost:5000/api/sites',
+                     json={'type': 'sites_by_name',
+                           'name': website_name,
+                           'favourite_sites': current_user.favourite_sites}).json()['not_favourite_sites'][0]['id']
+    put(f'http://localhost:5000/api/users/{current_user.id}',
+        json={
+            'type': 'add',
+            'website': website_id
+        }).json()
+    return redirect(f'/personal_account/{website_name}')
+
+
+@app.route('/delete_from_favourites/<string:website_name>', methods=['GET', 'PUT'])
+@login_required
+def delete_from_favourites(website_name):
+    website_id = get('http://localhost:5000/api/sites',
+                     json={'type': 'sites_by_name',
+                           'name': website_name,
+                           'favourite_sites': current_user.favourite_sites}).json()['favourite_sites'][0]['id']
+    put(f'http://localhost:5000/api/users/{current_user.id}',
+        json={
+            'type': 'delete',
+            'website': website_id
+        }).json()
+    return redirect(f'/personal_account/{website_name}')
 
 
 if __name__ == '__main__':

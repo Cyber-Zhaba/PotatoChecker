@@ -71,7 +71,9 @@
               <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-2">
                 <div class="u-border-3 u-border-custom-color-4 u-container-layout u-container-layout-2">
                   <div class="u-clearfix u-custom-html u-expanded u-custom-html-3">
-                    <img src="../static/img/{{image_name}}" width="99%" height="99%" alt="Plot">
+                      {% if image_name is not none %}
+                        <img src="../static/img/{{image_name}}" width="99%" height="99%" alt="Plot">
+                      {% endif %}
                   </div>
                 </div>
               </div>
@@ -89,8 +91,10 @@
               </div>
               <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-4">
                 <div class="u-container-layout u-container-layout-4">
-                  <a href="" class="u-border-3 u-border-hover-palette-3-light-2 u-border-white u-btn u-btn-round u-button-style u-none u-radius-50 u-text-active-palette-3-dark-2 u-text-body-alt-color u-btn-3">Добавить В избранное</a>
-                  <a href="" class="u-align-right u-border-3 u-border-hover-palette-2-light-2 u-border-white u-btn u-btn-round u-button-style u-none u-radius-50 u-text-active-palette-2-dark-3 u-text-body-alt-color u-btn-4">Удалить текущий сайт из избранного</a>
+                    {% if image_name is not none %}
+                  <a href="/add_to_favourites/{{ website_name }}" class="u-border-3 u-border-hover-palette-3-light-2 u-border-white u-btn u-btn-round u-button-style u-none u-radius-50 u-text-active-palette-3-dark-2 u-text-body-alt-color u-btn-3">Добавить В избранное</a>
+                  <a href="/delete_from_favourites/{{ website_name }}" class="u-align-right u-border-3 u-border-hover-palette-2-light-2 u-border-white u-btn u-btn-round u-button-style u-none u-radius-50 u-text-active-palette-2-dark-3 u-text-body-alt-color u-btn-4">Удалить текущий сайт из избранного</a>
+                    {% endif %}
                 </div>
               </div>
             </div>

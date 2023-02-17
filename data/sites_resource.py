@@ -51,10 +51,8 @@ class SitesResource(Resource):
         site = session.query(Sites).get(site_id)
 
         setattr(site, 'moderated', 1)
-        session.commit()
 
         session.commit()
-        print(session.query(Sites).get(site_id).moderated)
         return jsonify({'success': 'OK'})
 
 
