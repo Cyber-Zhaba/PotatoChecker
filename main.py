@@ -129,6 +129,8 @@ def personal_account(search):
     """User account page
     :var search: string, name of site to search"""
     form, form_2 = NameWebSiteForm(), CommentForm()
+    feedbacks, users = [], {}
+
     image_name = f'{current_user.name}.png' if search is not None and request != 'POST' else None
     flag_finder = False
     if request.method == "POST":
@@ -168,11 +170,9 @@ def personal_account(search):
                            'name': search}).json()['sites']
         if answer:
             site = answer[0]
+            feedback = [feedback for feedback in site['ids_feedbacks'].split(',') if feedback]
             feedbacks = db_sess.query(Feedbacks).filter(
-                Feedbacks.id.in_(list(map(int, site['ids_feedbacks'][:-1].split(','))))).all()
-        else:
-            feedbacks = []
-        users = {}
+                Feedbacks.id.in_(list(map(int, feedback)))).all()
         for i in feedbacks:
             users[i.id] = db_sess.query(User).filter(User.id == i.owner_id).first().name
         print(users)
