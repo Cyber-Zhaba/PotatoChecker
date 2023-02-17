@@ -1,5 +1,3 @@
-import time
-
 from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
 from data import db_session

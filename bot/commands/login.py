@@ -1,7 +1,6 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.state import State, StatesGroup
-from requests import get
 
 
 class LoginForm(StatesGroup):

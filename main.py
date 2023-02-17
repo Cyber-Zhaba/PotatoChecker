@@ -20,7 +20,6 @@ from forms.comment_form import CommentForm
 from forms.add_website_forms import AddWebsiteForm
 from forms.util_forms import NameWebSiteForm
 
-
 monkey.patch_all()
 UPLOAD_FOLDER = '/static/img'
 app = Flask(__name__)
@@ -33,27 +32,14 @@ login_manager.init_app(app)
 
 @app.errorhandler(401)
 def log_redirect(error):
+    """Handler for 401 and auto redirect to Login page"""
     print(error)
     return redirect('/login')
 
 
-@app.route('/About.html')
-def about():
-    return redirect("/about")
-
-
-@app.route('/Home.html')
-def home():
-    return redirect("/")
-
-
-@app.route('/Personal-account.html')
-def personal():
-    return redirect("/account")
-
-
 @app.route('/')
 def home_page():
+    """Home page"""
     return render_template('Home.html',
                            users_amount=len(get('http://localhost:5000/api/users').json()['users']),
                            sites_amount=len(get('http://localhost:5000/api/sites',
@@ -62,17 +48,14 @@ def home_page():
 
 @app.route('/about')
 def about_page():
+    """Page with info about service"""
     return render_template('About.html')
-
-
-@app.route('/account')
-def account_page():
-    return redirect('/personal_account')
 
 
 @app.route('/logout')
 @login_required
 def logout():
+    """Logout url"""
     logout_user()
     return redirect("/")
 
@@ -186,8 +169,7 @@ def personal_account(search):
                            website_name=search,
                            description="Visit our GayWebsite.com",
                            feedbacks=feedbacks,
-                           users=users
-                           )
+                           users=users)
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
