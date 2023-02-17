@@ -68,7 +68,9 @@ def personal():
 
 @app.route('/')
 def home_page():
-    return render_template('Home.html')
+    return render_template('Home.html',
+                           users_amount=len(get('http://localhost:5000/api/users').json()['users']),
+                           sites_amount=len(get('http://localhost:5000/api/sites', json={'type': 'all'}).json()['sites']))
 
 
 @app.route('/about')
