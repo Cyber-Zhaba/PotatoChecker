@@ -2,7 +2,6 @@
 import asyncio
 
 import matplotlib.pyplot as plt
-import schedule
 
 from flask import Flask, request
 from flask import render_template, redirect
@@ -230,8 +229,7 @@ def add_website():
                                'name': name,
                                'link': link},
                          timeout=(2, 20))
-                    return 'Ваш запрос был отправлен на модерацию'
-                    # TODO https://puzzleweb.ru/css/examples/21-5.php
+                    message = 'Ваш запрос был отправлен на модерацию'
     return render_template('Add_website.html', title=title, form=form, message=message)
 
 
