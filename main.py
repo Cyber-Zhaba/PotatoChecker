@@ -121,6 +121,7 @@ def personal_account(search):
     :var search: string, name of site to search"""
     form, form_2 = NameWebSiteForm(), CommentForm()
     feedbacks, users = [], {}
+
     image_name = f'{current_user.name}.png' if search is not None and request != 'POST' else None
     flag_finder = False
     if request.method == "POST":
@@ -129,19 +130,13 @@ def personal_account(search):
             flag_finder = True
         if form_2.validate_on_submit():
             if form_2.content.data != '':
-                db_sess = db_session.create_session()
-                site = db_sess.query(Sites).filter(Sites.name == search).first()
+                site = get('http://localhost:5000/api/sites',
+                           json={'type': 'strict_name', 'name': search}
+                        ).json()['sites'][0]
                 form.name.data = search
-                feedback = Feedbacks(
-                    content=form_2.content.data,
-                    owner_id=current_user.id)
-                db_sess.add(feedback)
-                feedback = db_sess.query(Feedbacks).all()[-1].id
-                if str(site.ids_feedbacks) == 'None':
-                    site.ids_feedbacks = str(feedback) + ','
-                else:
-                    site.ids_feedbacks = site.ids_feedbacks + str(feedback) + ','
-                db_sess.commit()
+                feedback = post('http://localhost:5000/api/feedback',
+                                json={'content': form_2.content.data, 'owner_id': current_user.id}).json()['id']
+                put(f'http://localhost:5000/api/sites/{site["id"]}', json={'type': 'add_feedback', 'feedback_id': feedback})
                 form_2.content.data = ''
     if search is None:
         req = {'type': 'all_by_groups',
@@ -149,7 +144,7 @@ def personal_account(search):
     else:
         req = {'type': 'sites_by_name', 'name': search,
                'favourite_sites': current_user.favourite_sites}
-    answer = get('http://localhost:5000/api/sites', json=req, timeout=(2, 20)).json()
+    answer = get('http://localhost:5000/api/sites', json=req).json()
 
     favourite_sites_names = answer['favourite_sites']
     not_favourite_sites_names = answer['not_favourite_sites']
@@ -157,16 +152,18 @@ def personal_account(search):
     if not flag_finder:
         answer = get('http://localhost:5000/api/sites',
                      json={'type': 'strict_name',
-                           'name': search},
-                     timeout=(2, 20)).json()['sites']
+                           'name': search}).json()['sites']
         if answer:
             site = answer[0]
-            feedback = [feedback for feedback in site['ids_feedbacks'].split(',') if feedback]
-            feedbacks = db_sess.query(Feedbacks).filter(
-                Feedbacks.id.in_(list(map(int, feedback)))).all()
+            feedback = site['ids_feedbacks']
+            # feedback = [feedback for feedback in site['ids_feedbacks'].split(',') if feedback]
+            if feedback:
+                feedbacks = get('http://localhost:5000/api/feedback',
+                                    json={'feedback': feedback}).json()['feedbacks']
         for i in feedbacks:
-            users[i.id] = db_sess.query(User).filter(User.id == i.owner_id).first().name
-        print(users)
+            users[i['id']] = get(f'http://localhost:5000/api/users/{i["owner_id"]}').json()['users']['name' \
+                                                                                                     '']
+            print(users)
     return render_template('personal_account_table.html',
                            favourite_sites=favourite_sites_names,
                            not_favourite_sites=not_favourite_sites_names,
@@ -177,7 +174,8 @@ def personal_account(search):
                            website_name=search,
                            description="Visit our GayWebsite.com",
                            feedbacks=feedbacks,
-                           users=users)
+                           users=users
+                           )
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])

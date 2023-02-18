@@ -1,3 +1,5 @@
+import time
+
 from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
 from data import db_session
@@ -22,6 +24,8 @@ class SitesResource(Resource):
         self.parser.add_argument('ping', required=False)
         self.parser.add_argument('check_time', required=False)
         self.parser.add_argument('ids_feedback', required=False)
+        self.parser.add_argument('feedback_id', required=False)
+        self.parser.add_argument('type', required=False)
 
     @staticmethod
     def get(site_id: int) -> Response:
@@ -47,8 +51,11 @@ class SitesResource(Resource):
         session = db_session.create_session()
 
         site = session.query(Sites).get(site_id)
-
-        setattr(site, 'moderated', 1)
+        if args['type'] == 'add_feedback':
+            zheleboba = ','.join([item for item in filter(lambda x: x, (site.ids_feedbacks.split(',') + [args['feedback_id']]))])
+            setattr(site, 'ids_feedbacks', zheleboba)
+        else:
+            setattr(site, 'moderated', 1)
 
         session.commit()
         return jsonify({'success': 'OK'})
