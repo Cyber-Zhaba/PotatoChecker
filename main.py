@@ -1,6 +1,7 @@
 """Flask main server file"""
 import asyncio
 import datetime
+import json
 from multiprocessing import Pool
 from pythonping import ping
 
@@ -11,7 +12,7 @@ from scriptes.email import send_email
 import matplotlib.pyplot as plt
 import logging
 
-from flask import Flask, request
+from flask import Flask, request, Response, session, url_for
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_restful import Api, abort
@@ -133,9 +134,16 @@ def personal_account(search):
     :var search: string, name of site to search"""
     form, form_2 = NameWebSiteForm(), CommentForm()
     feedbacks, users = [], {}
-
     image_name = f'{current_user.name}.png' if search is not None and request != 'POST' else None
     flag_finder = False
+    try:
+        a = request.args['messages']
+        form_2.content.data = a.split(':')[1][2:-2]
+        submit_comment_btn = 'Редактировать отзыв'
+        comment_title = 'Редактируйте отзыв:'
+    except Exception:
+        submit_comment_btn = 'Добавить отзыв'
+        comment_title = 'Добавьте отзыв:'
     if request.method == "POST":
         if form.validate_on_submit():
             search = form.name.data
@@ -152,6 +160,8 @@ def personal_account(search):
                 put(f'http://localhost:5000/api/sites/{site["id"]}',
                     json={'type': 'add_feedback', 'feedback_id': feedback})
                 form_2.content.data = ''
+                submit_comment_btn = 'Добавить отзыв'
+                comment_title = 'Добавьте отзыв:'
     if search is None:
         req = {'type': 'all_by_groups',
                'favourite_sites': current_user.favourite_sites}
@@ -187,7 +197,9 @@ def personal_account(search):
                            website_name=search,
                            description="Visit our GayWebsite.com",
                            feedbacks=feedbacks,
-                           users=users)
+                           users=users,
+                           submit_comment_btn=submit_comment_btn,
+                           comment_title=comment_title)
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
@@ -294,10 +306,21 @@ def decline_website(website_id):
     return redirect('/moderation')
 
 
-# @app.route('/edit_feedback/<int:feedback_id>', methods=['GET'])
-# @login_required
-# def edit_comment(feedback_id):
-#     pass
+@app.route('/edit_feedback/<int:feedback_id>', methods=['GET'])
+@login_required
+def edit_comment(feedback_id):
+    req = {'type': 'feedback_in_site',
+           'feedback_id': str(feedback_id)}
+    site = get('http://localhost:5000/api/sites', json=req).json()
+    feedback = get(f'http://localhost:5000/api/feedback/{feedback_id}').json()
+    messages = json.dumps({"content": feedback['sites']['content']})
+    name = site["sites"][0]["name"]
+    put('http://localhost:5000/api/sites',
+        json={'type': '',
+              'feedback_id': feedback_id,
+              'name': name})
+    delete(f'http://localhost:5000/api/feedback/{feedback_id}')
+    return redirect(url_for(f'personal_account', search=site["sites"][0]["name"], messages=messages))
 
 
 @app.route('/delete_feedback/<int:feedback_id>', methods=['GET', 'DELETE', 'PUT'])
@@ -308,9 +331,9 @@ def delete_comment(feedback_id):
     site = get('http://localhost:5000/api/sites', json=req).json()
     name = site["sites"][0]["name"]
     put('http://localhost:5000/api/sites',
-              json={'type': '',
-                    'feedback_id': feedback_id,
-                    'name': name})
+        json={'type': '',
+              'feedback_id': feedback_id,
+              'name': name})
     delete(f'http://localhost:5000/api/feedback/{feedback_id}')
     return redirect(f'/personal_account/{site["sites"][0]["name"]}')
 

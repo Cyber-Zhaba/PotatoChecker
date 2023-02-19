@@ -22,11 +22,11 @@ class FeedbackResource(Resource):
         self.parser.add_argument('feedback_id', required=False)
 
     @staticmethod
-    def get(index: int) -> dict:
+    def get(feedback_id: int) -> dict:
         """API method get"""
-        abort_feedback_not_found(index)
+        abort_feedback_not_found(feedback_id)
         session = db_session.create_session()
-        feedbacks = session.query(Feedbacks).get(index)
+        feedbacks = session.query(Feedbacks).get(feedback_id)
         return jsonify({'sites': feedbacks.to_dict(rules=("-feedback", "-feedback"))})
 
     @staticmethod
