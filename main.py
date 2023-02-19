@@ -45,7 +45,7 @@ login_manager.init_app(app)
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s [%(levelname)s]: %(message)s',
-    handlers=[logging.FileHandler("logs.log"), logging.StreamHandler(),]
+    handlers=[logging.FileHandler("logs.log"), logging.StreamHandler(), ]
 )
 
 
@@ -147,7 +147,8 @@ def personal_account(search):
                            ).json()['sites'][0]
                 form.name.data = search
                 feedback = post('http://localhost:5000/api/feedback',
-                                json={'content': form_2.content.data, 'owner_id': current_user.id}, timeout=(2, 20)).json()['id']
+                                json={'content': form_2.content.data, 'owner_id': current_user.id},
+                                timeout=(2, 20)).json()['id']
                 put(f'http://localhost:5000/api/sites/{site["id"]}',
                     json={'type': 'add_feedback', 'feedback_id': feedback})
                 form_2.content.data = ''
@@ -194,7 +195,7 @@ def draw_graphic(website_id):
     """Address to draw graph of stability
     :var website_id: int, id of site to plot"""
     website = get(f'http://localhost:5000/api/sites/{website_id}',
-               timeout=(2, 20)).json()['sites']
+                  timeout=(2, 20)).json()['sites']
     time = []
     reports = []
 
@@ -292,11 +293,11 @@ def decline_website(website_id):
     delete(f'http://localhost:5000/api/sites/{website_id}', timeout=(2, 20))
     return redirect('/moderation')
 
-#
+
 # @app.route('/edit_feedback/<int:feedback_id>', methods=['GET'])
 # @login_required
 # def edit_comment(feedback_id):
-#     form = NameWebSiteForm()
+#     pass
 
 
 @app.route('/delete_feedback/<int:feedback_id>', methods=['GET', 'DELETE', 'PUT'])
@@ -305,8 +306,12 @@ def delete_comment(feedback_id):
     req = {'type': 'feedback_in_site',
            'feedback_id': str(feedback_id)}
     site = get('http://localhost:5000/api/sites', json=req).json()
+    name = site["sites"][0]["name"]
+    put('http://localhost:5000/api/sites',
+              json={'type': '',
+                    'feedback_id': feedback_id,
+                    'name': name})
     delete(f'http://localhost:5000/api/feedback/{feedback_id}')
-    put('http://localhost:5000/api/sites', json={'feedback_id': str(feedback_id), 'site_name': site["sites"][0]["name"]})
     return redirect(f'/personal_account/{site["sites"][0]["name"]}')
 
 
@@ -352,7 +357,6 @@ def delete_from_favourites(website_name):
             timeout=(2, 20)).json()
 
     return redirect(f'/personal_account/{website_name}')
-
 
 
 def ping_websites():
