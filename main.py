@@ -10,6 +10,7 @@ from scriptes.availability_checker import ping_website
 from scriptes.email import send_email
 
 import matplotlib.pyplot as plt
+import matplotlib.dates as dates
 import logging
 
 from flask import Flask, request, Response, session, url_for
@@ -197,11 +198,11 @@ def personal_account(search):
                            form=form,
                            form_2=form_2,
                            website_name=search,
-                           description="Visit our GayWebsite.com",
                            feedbacks=feedbacks,
                            users=users,
                            submit_comment_btn=submit_comment_btn,
-                           comment_title=comment_title)
+                           comment_title=comment_title,
+                           flag_finder=flag_finder)
 
 
 @app.route('/draw_graphic/<int:website_id>', methods=['GET'])
@@ -222,25 +223,48 @@ def draw_graphic(website_id):
     time.reverse()
     reports.reverse()
 
-    print(f'{time=}')
+    logging.info(f'{time=}')
 
     name = get(f'http://localhost:5000/api/sites/{website_id}').json()['sites']['name']
-    plt.plot(time, reports)
     fig, axes = plt.subplots(facecolor='#21024c')
+
     axes.set_title(name.upper(), color='white', size='20')
+
     axes.set_facecolor(color='#21024c')
-    axes.plot(reports, color='#0f497f')
     axes.tick_params(axis='both', colors='white')
+
     axes.set_xlabel('Часы', color='white', size='13')
     axes.set_ylabel('Пинг', color='white', size='13')
+
     axes.spines['left'].set_color('white')
     axes.spines['bottom'].set_color('white')
     axes.spines['right'].set_color('#21024c')
     axes.spines['top'].set_color('#21024c')
+
     axes.grid(True)
     axes.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
+
+    axes.xaxis.set_major_formatter(dates.DateFormatter('%m.%d %H:%M'))
+    axes.xaxis.set_major_locator(dates.DayLocator(interval=1))
+
+    axes.plot(time, reports, color='#0f497f')
+
+    plt.gcf().autofmt_xdate()
     fig.savefig(f'static/img/{current_user.name}.png', dpi=200)
     return redirect(f'/personal_account/{name}')
+
+
+@app.route('/report/<string:website_name>')
+@login_required
+def report(website_name):
+    put('http://localhost:5000/api/sites',
+        json={
+            'type': 'report',
+            'name': website_name,
+            'id': current_user.id
+        })
+
+    return redirect(f'/personal_account/{website_name}')
 
 
 @app.route('/add_website', methods=['GET', 'POST'])
@@ -269,8 +293,9 @@ def add_website():
                                'name': name,
                                'link': link},
                          timeout=(2, 20))
-                    id_ = get('http://localhost:5000/api/sites', json={'type': 'strict_name',
-                                                                       'name': name})['sites'][0]['id']
+                    id_ = get('http://localhost:5000/api/sites',
+                              json={'type': 'strict_name',
+                                    'name': name}).json()['sites'][0]['id']
                     post('http://localhost:5000/api/plot', json={'site_id': id_})
                     message = 'Ваш запрос был отправлен на модерацию'
     return render_template('Add_website.html', title=title, form=form, message=message)
@@ -323,7 +348,8 @@ def edit_comment(feedback_id):
     put('http://localhost:5000/api/sites',
         json={'type': '',
               'feedback_id': feedback_id,
-              'name': name})
+              'name': name,
+              'type': 'try_hard'})
     delete(f'http://localhost:5000/api/feedback/{feedback_id}')
     return redirect(url_for(f'personal_account', search=site["sites"][0]["name"], messages=messages))
 
@@ -394,7 +420,7 @@ def ping_websites():
     count, timeout = 1, 1
 
     logging.debug('made response for ping')
-    websites = get('http://localhost:5000/api/sites', json={'type': 'all'}).json()["sites"]
+    websites = get('http://localhost:5000/api/sites', json={'type': 'all'}, timeout=(2, 20)).json()["sites"]
     websites = list(map(lambda x: list(x.values()) + [count, timeout], websites))
 
     result = [ping_website(item) for item in websites]
@@ -448,9 +474,9 @@ if __name__ == '__main__':
 
     db_session.global_init("data/data.db")
 
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(ping_websites, 'interval', seconds=90)
-    scheduler.start()
+    # scheduler = BackgroundScheduler()
+    # scheduler.add_job(ping_websites, 'interval', seconds=90)
+    # scheduler.start()
 
     http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
     http.serve_forever()

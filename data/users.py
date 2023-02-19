@@ -18,8 +18,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     favourite_sites = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
-    telegram_user_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
-
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
 

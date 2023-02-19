@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
 from data import db_session
 from data.users import User
+from requests import get
 
 
 def abort_if_users_not_found(users_id: int) -> None:
@@ -34,17 +35,52 @@ class TelegramResource(Resource):
 class TelegramListResource(Resource):
     def __init__(self) -> None:
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('username', required=True)
-        self.parser.add_argument('password', required=True)
+        self.parser.add_argument('type', required=True)
+        self.parser.add_argument('login', required=True)
+        self.parser.add_argument('password', required=False)
 
     def get(self) -> Response:
         args = self.parser.parse_args()
         session = db_session.create_session()
-        user = session.query(User).filter(User.username == args['username']).first()
+        result = jsonify({'failure': 'API Error'})
 
-        if user and user.check_password(args['password']):
-            return jsonify({'success': 'OK'})
-        return jsonify({'failure': 'Incorrect login or password'})
+        user = session.query(User).filter(User.username == args['login']).first()
 
-    def post(self) -> Response:
-        pass
+        match args['type']:
+            case 'login':
+                if user and user.check_password(args['password']):
+                    result = jsonify({'success': 'OK'})
+                else:
+                    result = jsonify({'failure': 'Incorrect login or password'})
+
+            case 'get_favourite_sites':
+                websites = get('http://localhost:5000/api/sites',
+                               json={
+                                   'type': 'all_by_groups',
+                                   'favourite_sites': user.favourite_sites
+                               }).json()['favourite_sites']
+
+                mess = 'Подключенние не установленно, попробуйте позже'
+
+                result = jsonify({'sites': [
+                    (item['name'], item['link'], (
+                        self.status(float(item['ping'].split(',')[-1])) if item['ping'] else mess
+                    )) for item in websites
+                ]})
+
+        return result
+
+    @staticmethod
+    def status(ping: float) -> str:
+        if 0 <= ping < 40:
+            return 'Подключение Отличное'
+        if 40 <= ping < 150:
+            return 'Подключение Нормальное'
+        if 150 <= ping < 350:
+            return 'Подключение Плохое'
+        if 350 <= ping < 700:
+            return 'Подключение Очень плохое'
+        if 700 <= ping < 1000:
+            return 'Время соединения очень большое. На сервер возможно производиться атака'
+        return 'Время ожидания привышенно. Сервер недоступен'
+

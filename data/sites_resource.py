@@ -76,6 +76,7 @@ class SitesListResource(Resource):
         self.parser.add_argument('type', required=True)
         self.parser.add_argument('favourite_sites', required=False)
         self.parser.add_argument('feedback_id', required=False)
+        self.parser.add_argument('id', required=False)
 
     def get(self) -> Response:
         """API method get"""
@@ -91,10 +92,12 @@ class SitesListResource(Resource):
                 sites_set = set(all_sites.filter(Sites.moderated == 1).all())
                 favourite_sites_set = set(all_sites.filter(Sites.id.in_(favourite), Sites.moderated == 1).all())
                 sites_not_favourite = sites_set - favourite_sites_set
-                result = jsonify(
-                    {'favourite_sites': [item.to_dict(only=('name', 'id', 'link')) for item in favourite_sites_set],
-                     'not_favourite_sites': [item.to_dict(only=(
-                         'name', 'id', 'link')) for item in sites_not_favourite]})
+                result = jsonify({
+                    'favourite_sites': [item.to_dict(
+                        only=('name', 'id', 'link', 'ping')) for item in favourite_sites_set],
+                    'not_favourite_sites': [item.to_dict(
+                        only=('name', 'id', 'link', 'ping')) for item in sites_not_favourite]
+                })
             case 'sites_by_name':
                 sites_favourite = all_sites.filter(Sites.name.contains(args['name']),
                                                    Sites.id.in_(favourite), Sites.moderated == 1).all()
@@ -154,10 +157,17 @@ class SitesListResource(Resource):
     def put(self) -> Response:
         args = self.parser.parse_args()
         session = db_session.create_session()
-        site = session.query(Sites).filter(Sites.name == args['name']).first()
-        zheleboba = site.ids_feedbacks.split(',')
-        zheleboba.remove(args['feedback_id'])
-        zheleboba = '' if len(zheleboba) == 0 else ','.join(zheleboba)
-        setattr(site, 'ids_feedbacks', zheleboba)
+        if args['type'] == 'report':
+            site = session.query(Sites).filter(Sites.name == args['name']).first()
+            if str(args['id']) not in site.reports.split(','):
+                setattr(site, 'reports', (
+                    site.reports + ',' + args['id'] if site.reports else args['id']
+                ))
+        else:
+            site = session.query(Sites).filter(Sites.name == args['name']).first()
+            zheleboba = site.ids_feedbacks.split(',')
+            zheleboba.remove(args['feedback_id'])
+            zheleboba = '' if len(zheleboba) == 0 else ','.join(zheleboba)
+            setattr(site, 'ids_feedbacks', zheleboba)
         session.commit()
         return jsonify({'success': 'OK'})
