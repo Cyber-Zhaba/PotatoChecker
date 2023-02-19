@@ -56,8 +56,6 @@ class SitesResource(Resource):
             case 'update_ping':
                 setattr(site, 'ping', ','.join(
                     [item for item in site.ping.split(',') + [args['ping']] if item]))
-                setattr(site, 'check_time', ','.join(
-                    [item for item in site.check_time.split(',') + [args['check_time']] if item]))
             case 'add_feedback':
                 zheleboba = ','.join(
                     [item for item in filter(lambda x: x, (site.ids_feedbacks.split(',') + [args['feedback_id']]))])
@@ -95,7 +93,8 @@ class SitesListResource(Resource):
                 sites_not_favourite = sites_set - favourite_sites_set
                 result = jsonify(
                     {'favourite_sites': [item.to_dict(only=('name', 'id', 'link')) for item in favourite_sites_set],
-                     'not_favourite_sites': [item.to_dict(only=('name', 'id', 'link')) for item in sites_not_favourite]})
+                     'not_favourite_sites': [item.to_dict(only=(
+                         'name', 'id', 'link')) for item in sites_not_favourite]})
             case 'sites_by_name':
                 sites_favourite = all_sites.filter(Sites.name.contains(args['name']),
                                                    Sites.id.in_(favourite), Sites.moderated == 1).all()
@@ -117,13 +116,21 @@ class SitesListResource(Resource):
                 result = jsonify({'sites': [item.to_dict(rules=("-site", "-site")) for item in mod]})
             case 'strict_name':
                 strict = self.session.query(Sites).filter(Sites.name == args['name'])
-                result = jsonify({'sites': [item.to_dict(only=('name', 'id', 'link', 'ids_feedbacks')) for item in strict]})
+                result = jsonify({'sites': [item.to_dict(
+                    only=('name', 'id', 'link', 'ids_feedbacks')) for item in strict]})
             case 'feedback_in_site':
                 site = self.session.query(Sites).all()
                 for i in site:
                     if args['feedback_id'] in i.ids_feedbacks.split(','):
                         site = i
                 result = jsonify({'sites': [site.to_dict(only=('name', 'id', 'link', 'ids_feedbacks'))]})
+            case 'all_ping_clear':
+                all_ping = self.session.query(Sites).filter(Sites.moderated == 1).all()
+                result = jsonify({'sites': [site.to_dict(only=('id', 'ping', 'reports')) for site in all_ping]})
+                for site in all_ping:
+                    setattr(site, 'ping', '')
+                    setattr(site, 'reports', '')
+                self.session.commit()
 
         return result
 
