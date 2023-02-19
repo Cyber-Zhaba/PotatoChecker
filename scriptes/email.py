@@ -59,5 +59,8 @@ def send(email: list, date: str, websites: list) -> None:
     s = smtplib.SMTP('smtp.yandex.ru:587')
     s.starttls()
     s.login(login, password)
-    s.send_message(msg)
+    try:
+        s.send_message(msg)
+    except Exception as error:
+        logging.warning(f'Мыло уперло {error}')
     s.quit()

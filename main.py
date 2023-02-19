@@ -28,6 +28,7 @@ from data.users_resource import UsersResource, UsersListResource
 from data.sites_resource import SitesResource, SitesListResource
 from data.feedback_resource import FeedbackResource, FeedbackListResource
 from data.telegram_resource import TelegramResource, TelegramListResource
+from data.plot_resource import PlotResource
 
 from forms.registration_forms import RegisterForm, LoginForm
 from forms.comment_form import CommentForm
@@ -47,6 +48,7 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s]: %(message)s',
     handlers=[logging.FileHandler("logs.log"), logging.StreamHandler(),]
 )
+N = 0
 
 
 @app.errorhandler(401)
@@ -193,15 +195,15 @@ def personal_account(search):
 def draw_graphic(website_id):
     """Address to draw graph of stability
     :var website_id: int, id of site to plot"""
-    website = get(f'http://localhost:5000/api/sites/{website_id}',
-               timeout=(2, 20)).json()['sites']
+    website = get(f'http://localhost:5000/api/plot', json={'id_site': website_id},
+               timeout=(2, 20)).json()['plot']
     time = []
     reports = []
 
-    for tm, ping_ in zip(reversed(website['check_time'].split(',')), reversed(website['ping'].split(','))):
-        delta = datetime.datetime.now() - datetime.datetime.strptime(tm, '%Y-%m-%d %H:%M:%S.%f')
+    for tm, ping_ in zip(reversed(website['point_time'].split(',')), reversed(website['points'].split(','))):
+        delta = datetime.datetime.now() - datetime.datetime.strptime(tm, '%m/%d/%Y/%H/%M')
         if delta <= datetime.timedelta(hours=8):
-            time.append(datetime.datetime.strptime(tm, '%Y-%m-%d %H:%M:%S.%f').hour)
+            time.append(datetime.datetime.strptime(tm, '%m/%d/%Y/%H/%M'))
             reports.append(float(ping_))
 
     time.reverse()
@@ -209,7 +211,7 @@ def draw_graphic(website_id):
 
     print(f'{time=}')
 
-    name = website['name']
+    name = get(f'http://localhost:5000/api/sites/{website_id}').json()['sites']['name']
     plt.plot(time, reports)
     fig, axes = plt.subplots(facecolor='#21024c')
     axes.set_title(name.upper(), color='white', size='20')
@@ -254,6 +256,9 @@ def add_website():
                                'name': name,
                                'link': link},
                          timeout=(2, 20))
+                    id_ = get('http://localhost:5000/api/sites', json={'type': 'strict_name',
+                                                                       'name': name})['sites'][0]['id']
+                    post('http://localhost:5000/api/plot', json={'site_id': id_})
                     message = 'Ваш запрос был отправлен на модерацию'
     return render_template('Add_website.html', title=title, form=form, message=message)
 
@@ -354,8 +359,10 @@ def delete_from_favourites(website_name):
     return redirect(f'/personal_account/{website_name}')
 
 
-
 def ping_websites():
+    global N
+    logging.info(f'N = {N + 1}')
+
     count, timeout = 1, 1
 
     logging.debug('made response for ping')
@@ -373,6 +380,31 @@ def ping_websites():
             timeout=(2, 20))
     send_email(result)
 
+    if (N := N + 1) % 5 == 0:
+        logging.debug('Entered (N := N + 1) % 5 == 0')
+        all_ping = get('http://localhost:5000/api/sites', json={'type': 'all_ping_clear'}).json()['sites']
+        users_n = len(get('http://localhost:5000/api/users', json={'type': 'all'}).json()['users'])
+
+        print(all_ping)
+        print(users_n)
+
+        for site_ping in all_ping:
+            id_, ping_, reports = site_ping.values()
+            ping_ = list(map(float, [item for item in ping_.split(',') if item]))
+            reports = reports.split(',')
+
+            ping_r = sum(ping_) / len(ping_) / 1000
+            reports_r = len(reports) / users_n
+
+            point = (ping_r + reports_r) / 2
+
+            if abs(ping_r - reports_r) >= 0.5:
+                point = max(ping_r, reports_r)
+
+            put('http://localhost:5000/api/plot',
+                json={'id_site': id_, 'points': round(point * 100),
+                      'point_time': datetime.datetime.now().strftime('%m/%d/%Y/%H/%M')})
+
 
 if __name__ == '__main__':
     api.add_resource(UsersListResource, '/api/users')
@@ -384,10 +416,12 @@ if __name__ == '__main__':
     api.add_resource(TelegramListResource, '/api/telegram')
     api.add_resource(TelegramResource, '/api/telegram/<int:user_id>')
 
+    api.add_resource(PlotResource, '/api/plot')
+
     db_session.global_init("data/data.db")
 
     scheduler = BackgroundScheduler()
-    scheduler.add_job(ping_websites, 'interval', seconds=75)
+    scheduler.add_job(ping_websites, 'interval', seconds=90)
     scheduler.start()
 
     http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
