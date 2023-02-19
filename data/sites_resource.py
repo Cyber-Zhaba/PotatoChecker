@@ -154,10 +154,10 @@ class SitesListResource(Resource):
     def put(self) -> Response:
         args = self.parser.parse_args()
         session = db_session.create_session()
-        site = session.query(Sites).filter(Sites.name == args['site_name']).first()
+        site = session.query(Sites).filter(Sites.name == args['name']).first()
         zheleboba = site.ids_feedbacks.split(',')
         zheleboba.remove(args['feedback_id'])
-        ','.join(zheleboba)
+        zheleboba = '' if len(zheleboba) == 0 else ','.join(zheleboba)
         setattr(site, 'ids_feedbacks', zheleboba)
         session.commit()
         return jsonify({'success': 'OK'})
