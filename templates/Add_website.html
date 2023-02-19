@@ -1,19 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html style="font-size: 16px;" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <h1>{{ title }}</h1>
-    <form action="" enctype=multipart/form-data method="post">
-        {{ form.hidden_tag() }}
-        {{ form.name.label }}
-        {{ form.name(class="form-control", type="name") }}
-        {{ form.link.label }}
-        {{ form.link(class="form-control", type="link") }}
-        {{ message }}
-        <button type="submit" id="submit" name="submit" value="Submit" class="btn btn-primary">Добавить сайт</button>
-    </form>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <title>Добавление сайта</title>
+    <link rel="stylesheet" href="../static/css/pages.css" media="screen">
+    <link rel="stylesheet" href="../static/css/Add_website.css" media="screen">
+    <script class="u-script" type="text/javascript" src="../static/js/jquery.js" defer=""></script>
+    <script class="u-script" type="text/javascript" src="../static/js/pages.js" defer=""></script>
+    <link id="u-theme-google-font" rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+    <meta name="theme-color" content="#0f497f">
+    <meta property="og:type" content="website">
 </head>
-<body>
+<body class="u-body u-xl-mode" data-lang="en">
+<header class="u-black u-clearfix u-header u-header" id="sec-f6fd">
+    <div class="u-clearfix u-sheet u-sheet-1">
+        <nav class="u-dropdown-icon u-menu u-menu-hamburger u-offcanvas u-menu-1" data-responsive-from="XL"
+             data-position="">
+            <div class="menu-collapse" style="font-size: 1rem; letter-spacing: 0px;">
+                <a class="u-button-style u-custom-color u-custom-left-right-menu-spacing u-custom-padding-bottom u-custom-top-bottom-menu-spacing u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
+                   href="#">
+                    <svg class="u-svg-link" viewBox="0 0 24 24">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#menu-hamburger"></use>
+                    </svg>
+                    <svg class="u-svg-content" version="1.1" id="menu-hamburger" viewBox="0 0 16 16" x="0px" y="0px"
+                         xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+                        <g>
+                            <rect y="1" width="16" height="2"></rect>
+                            <rect y="7" width="16" height="2"></rect>
+                            <rect y="13" width="16" height="2"></rect>
+                        </g>
+                    </svg>
+                </a>
+            </div>
+            <div class="u-custom-menu u-nav-container">
+                <ul class="u-nav u-unstyled u-nav-1">
+                    <li class="u-nav-item"><a
+                            class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
+                            href="../" style="padding: 10px 20px;">Главная страница</a>
+                    </li>
+                    <li class="u-nav-item"><a
+                            class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
+                            href="/about" style="padding: 10px 20px;">О нас</a>
+                    </li>
+                    <li class="u-nav-item"><a
+                            class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
+                            href="/account" style="padding: 10px 20px;">Личный кабинет</a>
+                    </li>
+                    {%if current_user.id == 1%}
+                    <li class="u-nav-item"><a
+                            class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
+                            href="/moderation" style="padding: 10px 20px;">Модерация</a></li>
+                    {%endif%}
+                    <li class="u-nav-item"><a
+                            class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
+                            href="/logout" style="padding: 10px 20px;">Выйти из аккаунта</a></li>
 
+                </ul>
+            </div>
+            <div class="u-custom-menu u-nav-container-collapse">
+                <div class="u-black u-border-3 u-border-grey-75 u-container-style u-inner-container-layout u-opacity u-opacity-70 u-sidenav">
+                    <div class="u-inner-container-layout u-sidenav-overflow">
+                        <div class="u-menu-close"></div>
+                        <ul class="u-align-center u-nav u-popupmenu-items u-spacing-7 u-unstyled u-nav-2">
+                            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="../">Главная
+                                страница</a>
+                            </li>
+                            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/about">О нас</a>
+                            </li>
+                            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/account">Личный
+                                кабинет</a>
+                            </li>
+                            {%if current_user.id == 1%}
+                            <li class="u-nav-item"><a
+                                    class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
+                                    href="/moderation" style="padding: 10px 20px;">Модерация</a></li>
+                            {%endif%}
+                            <li class="u-nav-item"><a
+                                    class="u-button-style u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
+                                    href="/logout" style="padding: 10px 20px;">Выйти из аккаунта</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="u-menu-overlay u-opacity u-opacity-70"></div>
+            </div>
+        </nav>
+        <img class="u-image u-image-contain u-image-default u-image-1" src="../static/img/graph.png" alt=""
+             data-image-width="900" data-image-height="488">
+        <img class="u-align-left u-image u-image-contain u-image-default u-preserve-proportions u-image-2"
+             src="../static/img/git.png" alt="" data-image-width="1200" data-image-height="1200"
+             data-href="https://github.com/Cyber-Zhaba/PotatoChecker" data-target="_blank">
+    </div>
+</header>
+
+<section class="u-clearfix u-custom-color-3 u-section-1" id="sec-f76e">
+    <div class="u-clearfix u-sheet u-sheet-1">
+        <div class="u-clearfix u-expanded-width u-layout-wrap u-layout-wrap-1">
+            <div class="u-layout">
+                <div class="u-layout-col">
+                    <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-1">
+                        <div class="u-container-layout u-valign-middle u-container-layout-1">
+                            <h3 class="u-text u-text-default u-text-1">Добавление сайта</h3>
+                        </div>
+                    </div>
+                    <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-2">
+                        <div class="u-container-layout u-container-layout-2">
+                            <div class="u-border-4 u-border-no-bottom u-border-no-left u-border-no-right u-border-white u-clearfix u-custom-html u-custom-html-1">
+                                <form action="" class="card signin" style="background-color: transparent"
+                                      enctype="multipart/form-data" method="post"> {{
+                                    form.hidden_tag() }}
+                                    {{ form.name.label }}
+                                    {{ form.name(class="form-control", type="name") }}
+                                    {{ form.link.label }}
+                                    {{ form.link(class="form-control", type="link") }}
+                                    <br>
+                                    {{ message }}
+                                    <br>
+                                    <br>
+                                    <div class="d-grid">
+                                        <button type="submit" id="submit" name="submit" value="Submit"
+                                                class="btn btn-primary">Добавить сайт
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 </body>
 </html>

@@ -9,7 +9,6 @@ from scriptes.availability_checker import ping_website
 from scriptes.email import send_email
 
 import matplotlib.pyplot as plt
-import schedule
 import logging
 
 from flask import Flask, request
@@ -134,6 +133,7 @@ def personal_account(search):
     :var search: string, name of site to search"""
     form, form_2 = NameWebSiteForm(), CommentForm()
     feedbacks, users = [], {}
+
     image_name = f'{current_user.name}.png' if search is not None and request != 'POST' else None
     flag_finder = False
     if request.method == "POST":
@@ -142,19 +142,14 @@ def personal_account(search):
             flag_finder = True
         if form_2.validate_on_submit():
             if form_2.content.data != '':
-                db_sess = db_session.create_session()
-                site = db_sess.query(Sites).filter(Sites.name == search).first()
+                site = get('http://localhost:5000/api/sites',
+                           json={'type': 'strict_name', 'name': search}, timeout=(2, 20)
+                           ).json()['sites'][0]
                 form.name.data = search
-                feedback = Feedbacks(
-                    content=form_2.content.data,
-                    owner_id=current_user.id)
-                db_sess.add(feedback)
-                feedback = db_sess.query(Feedbacks).all()[-1].id
-                if str(site.ids_feedbacks) == 'None':
-                    site.ids_feedbacks = str(feedback) + ','
-                else:
-                    site.ids_feedbacks = site.ids_feedbacks + str(feedback) + ','
-                db_sess.commit()
+                feedback = post('http://localhost:5000/api/feedback',
+                                json={'content': form_2.content.data, 'owner_id': current_user.id}, timeout=(2, 20)).json()['id']
+                put(f'http://localhost:5000/api/sites/{site["id"]}',
+                    json={'type': 'add_feedback', 'feedback_id': feedback})
                 form_2.content.data = ''
     if search is None:
         req = {'type': 'all_by_groups',
@@ -170,16 +165,17 @@ def personal_account(search):
     if not flag_finder:
         answer = get('http://localhost:5000/api/sites',
                      json={'type': 'strict_name',
-                           'name': search},
-                     timeout=(2, 20)).json()['sites']
+                           'name': search}, timeout=(2, 20)).json()['sites']
         if answer:
             site = answer[0]
-            feedback = [feedback for feedback in site['ids_feedbacks'].split(',') if feedback]
-            feedbacks = db_sess.query(Feedbacks).filter(
-                Feedbacks.id.in_(list(map(int, feedback)))).all()
+            feedback = site['ids_feedbacks']
+            # feedback = [feedback for feedback in site['ids_feedbacks'].split(',') if feedback]
+            if feedback:
+                feedbacks = get('http://localhost:5000/api/feedback',
+                                json={'feedback': feedback}, timeout=(2, 20)).json()['feedbacks']
         for i in feedbacks:
-            users[i.id] = db_sess.query(User).filter(User.id == i.owner_id).first().name
-        print(users)
+            users[i['id']] = get(f'http://localhost:5000/api/users/{i["owner_id"]}', timeout=(
+                2, 20)).json()['users']['name']
     return render_template('personal_account_table.html',
                            favourite_sites=favourite_sites_names,
                            not_favourite_sites=not_favourite_sites_names,
@@ -258,8 +254,7 @@ def add_website():
                                'name': name,
                                'link': link},
                          timeout=(2, 20))
-                    return 'Ваш запрос был отправлен на модерацию'
-                    # TODO https://puzzleweb.ru/css/examples/21-5.php
+                    message = 'Ваш запрос был отправлен на модерацию'
     return render_template('Add_website.html', title=title, form=form, message=message)
 
 
@@ -296,6 +291,23 @@ def decline_website(website_id):
         abort(403)
     delete(f'http://localhost:5000/api/sites/{website_id}', timeout=(2, 20))
     return redirect('/moderation')
+
+#
+# @app.route('/edit_feedback/<int:feedback_id>', methods=['GET'])
+# @login_required
+# def edit_comment(feedback_id):
+#     form = NameWebSiteForm()
+
+
+@app.route('/delete_feedback/<int:feedback_id>', methods=['GET', 'DELETE', 'PUT'])
+@login_required
+def delete_comment(feedback_id):
+    req = {'type': 'feedback_in_site',
+           'feedback_id': str(feedback_id)}
+    site = get('http://localhost:5000/api/sites', json=req).json()
+    delete(f'http://localhost:5000/api/feedback/{feedback_id}')
+    put('http://localhost:5000/api/sites', json={'feedback_id': str(feedback_id), 'site_name': site["sites"][0]["name"]})
+    return redirect(f'/personal_account/{site["sites"][0]["name"]}')
 
 
 @app.route('/add_to_favourites/<string:website_name>', methods=['GET', 'PUT'])
@@ -342,10 +354,6 @@ def delete_from_favourites(website_name):
     return redirect(f'/personal_account/{website_name}')
 
 
-def test(args):
-    a, b = args
-    return a * b
-
 
 def ping_websites():
     count, timeout = 1, 1
@@ -378,9 +386,9 @@ if __name__ == '__main__':
 
     db_session.global_init("data/data.db")
 
-    # scheduler = BackgroundScheduler()
-    # scheduler.add_job(ping_websites, 'interval', seconds=75)
-    # scheduler.start()
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(ping_websites, 'interval', seconds=75)
+    scheduler.start()
 
     http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
     http.serve_forever()
