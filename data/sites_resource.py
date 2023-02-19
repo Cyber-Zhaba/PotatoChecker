@@ -22,6 +22,7 @@ class SitesResource(Resource):
         self.parser.add_argument('ping', required=False)
         self.parser.add_argument('check_time', required=False)
         self.parser.add_argument('ids_feedback', required=False)
+        self.parser.add_argument('type', required=False)
 
     @staticmethod
     def get(site_id: int) -> Response:
@@ -48,7 +49,14 @@ class SitesResource(Resource):
 
         site = session.query(Sites).get(site_id)
 
-        setattr(site, 'moderated', 1)
+        match args['type']:
+            case 'mod':
+                setattr(site, 'moderated', 1)
+            case 'update_ping':
+                setattr(site, 'ping', ','.join(
+                    [item for item in site.ping.split(',') + [args['ping']] if item]))
+                setattr(site, 'check_time', ','.join(
+                    [item for item in site.check_time.split(',') + [args['check_time']] if item]))
 
         session.commit()
         return jsonify({'success': 'OK'})
@@ -115,6 +123,8 @@ class SitesListResource(Resource):
             name=args['name'],
             link=args['link'],
             ids_feedbacks='',
+            ping='',
+            check_time='',
             moderated=0
         )
         session.add(sites)

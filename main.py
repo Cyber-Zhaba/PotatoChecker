@@ -1,8 +1,16 @@
 """Flask main server file"""
 import asyncio
+import datetime
+from multiprocessing import Pool
+from pythonping import ping
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from scriptes.availability_checker import ping_website
+from scriptes.email import send_email
 
 import matplotlib.pyplot as plt
 import schedule
+import logging
 
 from flask import Flask, request
 from flask import render_template, redirect
@@ -35,6 +43,11 @@ app.config['SECRET_KEY'] = 'prev_prof_lovers_secret_key'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 login_manager = LoginManager(app)
 login_manager.init_app(app)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s [%(levelname)s]: %(message)s',
+    handlers=[logging.FileHandler("logs.log"), logging.StreamHandler(),]
+)
 
 
 @app.errorhandler(401)
@@ -184,10 +197,23 @@ def personal_account(search):
 def draw_graphic(website_id):
     """Address to draw graph of stability
     :var website_id: int, id of site to plot"""
-    time = range(1, 9)
-    reports = [0, 0, 1, 3, 0, 5, 4, 5]
-    name = get(f'http://localhost:5000/api/sites/{website_id}',
-               timeout=(2, 20)).json()['sites']['name']
+    website = get(f'http://localhost:5000/api/sites/{website_id}',
+               timeout=(2, 20)).json()['sites']
+    time = []
+    reports = []
+
+    for tm, ping_ in zip(reversed(website['check_time'].split(',')), reversed(website['ping'].split(','))):
+        delta = datetime.datetime.now() - datetime.datetime.strptime(tm, '%Y-%m-%d %H:%M:%S.%f')
+        if delta <= datetime.timedelta(hours=8):
+            time.append(datetime.datetime.strptime(tm, '%Y-%m-%d %H:%M:%S.%f').hour)
+            reports.append(float(ping_))
+
+    time.reverse()
+    reports.reverse()
+
+    print(f'{time=}')
+
+    name = website['name']
     plt.plot(time, reports)
     fig, axes = plt.subplots(facecolor='#21024c')
     axes.set_title(name.upper(), color='white', size='20')
@@ -195,7 +221,7 @@ def draw_graphic(website_id):
     axes.plot(reports, color='#0f497f')
     axes.tick_params(axis='both', colors='white')
     axes.set_xlabel('Часы', color='white', size='13')
-    axes.set_ylabel('Количество жалоб', color='white', size='13')
+    axes.set_ylabel('Пинг', color='white', size='13')
     axes.spines['left'].set_color('white')
     axes.spines['bottom'].set_color('white')
     axes.spines['right'].set_color('#21024c')
@@ -256,7 +282,7 @@ def accept_website(website_id):
     if current_user.id != 1:
         abort(403)
     put(f'http://localhost:5000/api/sites/{website_id}',
-        json={'moderated': 1},
+        json={'type': 'mod', 'moderated': 1},
         timeout=(2, 20))
     return redirect('/moderation')
 
@@ -278,11 +304,11 @@ def add_to_favourite(website_name):
     """Adding site to user favourites
         :var website_name: int, id to add in favourite list"""
     website_id = get('http://localhost:5000/api/sites',
-                     json={'type': 'sites_by_name',
+                     json={'type': 'strict_name',
                            'name': website_name,
                            'favourite_sites': current_user.favourite_sites},
                      timeout=(2, 20))
-    website_id = website_id.json()['not_favourite_sites']
+    website_id = website_id.json()['sites']
     # TODO check multiply addition
     if website_id:
         website_id = website_id[0]['id']
@@ -300,11 +326,11 @@ def delete_from_favourites(website_name):
     """Deleting site from favourites
         :var website_name: int, id to delete from favourite list"""
     website_id = get('http://localhost:5000/api/sites',
-                     json={'type': 'sites_by_name',
+                     json={'type': 'strict_name',
                            'name': website_name,
                            'favourite_sites': current_user.favourite_sites},
                      timeout=(2, 20))
-    website_id = website_id.json()['favourite_sites']
+    website_id = website_id.json()['sites']
     if website_id:
         # TODO multiply deletion
         website_id = website_id[0]['id']
@@ -316,30 +342,31 @@ def delete_from_favourites(website_name):
     return redirect(f'/personal_account/{website_name}')
 
 
-async def repeat(interval, func, *args, **kwargs):
-    """Run func every interval seconds.
-
-    If func has not finished before *interval*, will run again
-    immediately when the previous iteration finished.
-
-    *args and **kwargs are passed as the arguments to func.
-    """
-    while True:
-        await asyncio.gather(
-            func(*args, **kwargs),
-            asyncio.sleep(interval))
+def test(args):
+    a, b = args
+    return a * b
 
 
-async def ping_all_sites():
-    await asyncio.sleep(0.01)
-    print('Hello')
+def ping_websites():
+    count, timeout = 1, 1
+
+    logging.debug('made response for ping')
+    websites = get('http://localhost:5000/api/sites', json={'type': 'all'}).json()["sites"]
+    websites = list(map(lambda x: list(x.values()) + [count, timeout], websites))
+
+    result = [ping_website(item) for item in websites]
+
+    print(f'{result=}')
+    logging.debug(str(result))
+
+    for res in result:
+        put(f'http://localhost:5000/api/sites/{res[0]}',
+            json={'type': 'update_ping', 'ping': res[1], 'check_time': str(datetime.datetime.now())},
+            timeout=(2, 20))
+    send_email(result)
 
 
-async def ping_handler():
-    await asyncio.ensure_future(repeat(3, ping_all_sites))
-
-
-async def flask_server():
+if __name__ == '__main__':
     api.add_resource(UsersListResource, '/api/users')
     api.add_resource(UsersResource, '/api/users/<int:user_id>')
     api.add_resource(SitesListResource, '/api/sites')
@@ -348,16 +375,12 @@ async def flask_server():
     api.add_resource(FeedbackResource, '/api/feedback/<int:feedback_id>')
     api.add_resource(TelegramListResource, '/api/telegram')
     api.add_resource(TelegramResource, '/api/telegram/<int:user_id>')
+
     db_session.global_init("data/data.db")
+
+    # scheduler = BackgroundScheduler()
+    # scheduler.add_job(ping_websites, 'interval', seconds=75)
+    # scheduler.start()
+
     http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
     http.serve_forever()
-    await flask_server
-
-
-if __name__ == '__main__':
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    tasks = [loop.create_task(flask_server()),
-             loop.create_task(ping_handler())]
-    loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()

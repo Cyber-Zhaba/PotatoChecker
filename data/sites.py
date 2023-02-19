@@ -10,6 +10,6 @@ class Sites(SqlAlchemyBase, SerializerMixin):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     link = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     ping = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    check_time = sqlalchemy.Column(sqlalchemy.DATETIME, nullable=True)
+    check_time = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     ids_feedbacks = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     moderated = sqlalchemy.Column(sqlalchemy.BOOLEAN)

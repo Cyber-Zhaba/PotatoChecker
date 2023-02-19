@@ -78,7 +78,8 @@ class UsersListResource(Resource):
         users = User(
             username=args['username'],
             name=args['name'],
-            email=args['email']
+            email=args['email'],
+            favourite_sites=''
         )
         users.set_password(args['password'])
         session.add(users)
