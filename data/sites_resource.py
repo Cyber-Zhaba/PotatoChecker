@@ -71,6 +71,7 @@ class SitesListResource(Resource):
         self.parser.add_argument('link', required=False)
         self.parser.add_argument('type', required=True)
         self.parser.add_argument('favourite_sites', required=False)
+        self.parser.add_argument('feedback_id', required=False)
 
     def get(self) -> Response:
         """API method get"""
@@ -111,6 +112,13 @@ class SitesListResource(Resource):
             case 'strict_name':
                 strict = self.session.query(Sites).filter(Sites.name == args['name'])
                 result = jsonify({'sites': [item.to_dict(only=('name', 'id', 'link', 'ids_feedbacks')) for item in strict]})
+            case 'feedback_in_site':
+                site = self.session.query(Sites).all()
+                for i in site:
+                    if args['feedback_id'] in i.ids_feedbacks.split(','):
+                        site = i
+                result = jsonify({'sites': [site.to_dict(only=('name', 'id', 'link', 'ids_feedbacks'))]})
+
         return result
 
     def post(self) -> Response:
@@ -125,5 +133,16 @@ class SitesListResource(Resource):
             moderated=0
         )
         session.add(sites)
+        session.commit()
+        return jsonify({'success': 'OK'})
+
+    def put(self) -> Response:
+        args = self.parser.parse_args()
+        session = db_session.create_session()
+        site = session.query(Sites).filter(Sites.name == args['site_name']).first()
+        zheleboba = site.ids_feedbacks.split(',')
+        zheleboba.remove(args['feedback_id'])
+        ','.join(zheleboba)
+        setattr(site, 'ids_feedbacks', zheleboba)
         session.commit()
         return jsonify({'success': 'OK'})

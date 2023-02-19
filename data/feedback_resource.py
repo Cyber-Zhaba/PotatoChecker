@@ -16,9 +16,10 @@ class FeedbackResource(Resource):
     def __init__(self) -> None:
         """Create sqldb parser"""
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('owner_id', required=True)
-        self.parser.add_argument('time', required=True)
-        self.parser.add_argument('content', required=True)
+        self.parser.add_argument('owner_id', required=False)
+        self.parser.add_argument('time', required=False)
+        self.parser.add_argument('content', required=False)
+        self.parser.add_argument('feedback_id', required=False)
 
     @staticmethod
     def get(index: int) -> dict:
@@ -29,11 +30,11 @@ class FeedbackResource(Resource):
         return jsonify({'sites': feedbacks.to_dict(rules=("-feedback", "-feedback"))})
 
     @staticmethod
-    def delete(index: int) -> dict:
+    def delete(feedback_id: int) -> dict:
         """API method delete"""
-        abort_feedback_not_found(index)
+        abort_feedback_not_found(feedback_id)
         session = db_session.create_session()
-        feedbacks = session.query(Feedbacks).get(index)
+        feedbacks = session.query(Feedbacks).get(feedback_id)
         session.delete(feedbacks)
         session.commit()
         return jsonify({'success': 'OK'})

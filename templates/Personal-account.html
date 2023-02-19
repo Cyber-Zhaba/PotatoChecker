@@ -173,6 +173,14 @@
                                                     <div style="">
                                                         <h5>Автор: {{users[feedback.id]}}</h5>
                                                         <p style="size: 10px">{{feedback.content}}</p>
+                                                        <div class="finder">
+                                                            {% if current_user.id == feedback.owner_id or current_user.id == 1 %}
+                                                                <div class="btn-group">
+                                                                    <a href="../edit_feedback/{{feedback.id}}" style="padding: 3px 24px" class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-10 u-btn-2">Редактировать отзыв</a>
+                                                                    <a href="../delete_feedback/{{feedback.id}}" style="padding: 3px 24px" class="u-btn u-btn-round u-button-style u-hover-palette-1-light-1 u-palette-1-base u-radius-10 u-btn-2">Удалить отзыв</a>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
                                                     </div>
                                                     {% endfor %}
                                                     <hr color="white">

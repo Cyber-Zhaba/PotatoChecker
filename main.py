@@ -132,11 +132,12 @@ def personal_account(search):
             if form_2.content.data != '':
                 site = get('http://localhost:5000/api/sites',
                            json={'type': 'strict_name', 'name': search}
-                        ).json()['sites'][0]
+                           ).json()['sites'][0]
                 form.name.data = search
                 feedback = post('http://localhost:5000/api/feedback',
                                 json={'content': form_2.content.data, 'owner_id': current_user.id}).json()['id']
-                put(f'http://localhost:5000/api/sites/{site["id"]}', json={'type': 'add_feedback', 'feedback_id': feedback})
+                put(f'http://localhost:5000/api/sites/{site["id"]}',
+                    json={'type': 'add_feedback', 'feedback_id': feedback})
                 form_2.content.data = ''
     if search is None:
         req = {'type': 'all_by_groups',
@@ -159,11 +160,10 @@ def personal_account(search):
             # feedback = [feedback for feedback in site['ids_feedbacks'].split(',') if feedback]
             if feedback:
                 feedbacks = get('http://localhost:5000/api/feedback',
-                                    json={'feedback': feedback}).json()['feedbacks']
+                                json={'feedback': feedback}).json()['feedbacks']
         for i in feedbacks:
             users[i['id']] = get(f'http://localhost:5000/api/users/{i["owner_id"]}').json()['users']['name' \
                                                                                                      '']
-            print(users)
     return render_template('personal_account_table.html',
                            favourite_sites=favourite_sites_names,
                            not_favourite_sites=not_favourite_sites_names,
@@ -268,6 +268,23 @@ def decline_website(website_id):
         abort(403)
     delete(f'http://localhost:5000/api/sites/{website_id}', timeout=(2, 20))
     return redirect('/moderation')
+
+#
+# @app.route('/edit_feedback/<int:feedback_id>', methods=['GET'])
+# @login_required
+# def edit_comment(feedback_id):
+#     form = NameWebSiteForm()
+
+
+@app.route('/delete_feedback/<int:feedback_id>', methods=['GET', 'DELETE', 'PUT'])
+@login_required
+def delete_comment(feedback_id):
+    req = {'type': 'feedback_in_site',
+           'feedback_id': str(feedback_id)}
+    site = get('http://localhost:5000/api/sites', json=req).json()
+    delete(f'http://localhost:5000/api/feedback/{feedback_id}')
+    put('http://localhost:5000/api/sites', json={'feedback_id': str(feedback_id), 'site_name': site["sites"][0]["name"]})
+    return redirect(f'/personal_account/{site["sites"][0]["name"]}')
 
 
 @app.route('/add_to_favourites/<string:website_name>', methods=['GET', 'PUT'])
