@@ -49,7 +49,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s [%(levelname)s]: %(message)s',
     handlers=[logging.FileHandler("logs.log"),
-              logging.StreamHandler(), ])
+              logging.StreamHandler()])
 N = 0
 
 
@@ -89,6 +89,8 @@ def logout():
 def load_user(user_id):
     """Load user"""
     session = db_session.create_session()
+    result = session.get(User, user_id)
+    session.close()
     return session.get(User, user_id)
 
 
@@ -111,6 +113,7 @@ def register():
                 user = session.query(User).filter(User.username == f'{form.username.data}').first()
                 login_user(user, remember=form.remember_me.data)
                 return redirect("/account", 301)
+            session.close()
     return render_template('Register.html', title='Регистрация', form=form, message=message)
 
 
@@ -126,6 +129,7 @@ def login():
                 login_user(user, remember=form.remember_me.data)
                 return redirect("/personal_account", 301)
             message = "Неправильный логин или пароль"
+            session.close()
     return render_template('Login.html', form=form, message=message)
 
 
@@ -268,7 +272,6 @@ def report(website_name):
             'name': website_name,
             'id': current_user.id
         })
-
     return redirect(f'/personal_account/{website_name}')
 
 
@@ -303,6 +306,7 @@ def add_website():
                                     'name': name}).json()['sites'][0]['id']
                     post('http://localhost:5000/api/plot', json={'site_id': id_})
                     message = 'Ваш запрос был отправлен на модерацию'
+            session.close()
     return render_template('Add_website.html', title=title, form=form, message=message)
 
 
