@@ -347,7 +347,7 @@ def edit_comment(feedback_id):
            'feedback_id': str(feedback_id)}
     site = get('http://localhost:5000/api/sites', json=req).json()
     feedback = get(f'http://localhost:5000/api/feedback/{feedback_id}').json()
-    messages = json.dumps({"content": feedback['sites']['content']})
+    messages = json.dumps({"content": feedback['sites']['content']}).encode('utf8')
     name = site["sites"][0]["name"]
     put('http://localhost:5000/api/sites',
         json={'type': '',
