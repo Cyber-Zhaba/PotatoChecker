@@ -16,7 +16,7 @@ async def menu_command_renamed(message: types.Message):
             reply_markup=state_on_keyboard
         )
     else:
-        await message.answer('Сначала войдите в аккаунт')
+        await message.answer('<em>Сначала войдите в аккаунт</em>')
 
 
 async def call_notifications_on(callback_query: types.CallbackQuery):
@@ -32,7 +32,7 @@ async def call_notifications_on(callback_query: types.CallbackQuery):
         else:
             await callback_query.answer('Уведомления включены')
     else:
-        await bot.send_message(callback_query.from_user.id, 'Вы не вошли в аккаунт')
+        await bot.send_message(callback_query.from_user.id, '<em>Вы не вошли в аккаунт</em>')
 
 
 async def call_get_report(callback_query: types.CallbackQuery):
@@ -53,7 +53,7 @@ async def call_get_report(callback_query: types.CallbackQuery):
             reply_markup=back_keyboard
         )
     else:
-        await bot.send_message(callback_query.from_user.id, 'Вы не вошли в аккаунт')
+        await bot.send_message(callback_query.from_user.id, '<em>Вы не вошли в аккаунт</em>')
 
 
 async def call_back(callback_query: types.CallbackQuery):

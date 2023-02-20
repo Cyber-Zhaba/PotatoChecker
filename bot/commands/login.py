@@ -43,13 +43,14 @@ async def get_user_password(message: types.Message, state: FSMContext):
                                   'telegram_id': message.from_user.id}).json()
     if responce['success'] == 'OK':
         await state.finish()
-        await message.answer('Вы вошли')
+        await message.answer('Вы успешно вошли')
     else:
         await message.answer('Неверный логин или пароль пользователя')
         await state.finish()
 
 
 async def logout_command(message: types.Message):
-    responce = requests.put('http://localhost:5000/api/telegram',
-                            json={'telegram_id': message.from_user.id}).json()
+    requests.put('http://localhost:5000/api/telegram',
+                 json={'type': 'logout',
+                       'telegram_id': message.from_user.id}).json()
     await message.answer('Вы успешно вышли')
