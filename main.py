@@ -437,7 +437,7 @@ def ping_websites():
         users_n = len(get('http://localhost:5000/api/users', json={'type': 'all'}).json()['users'])
 
         for site_ping in all_ping:
-            id_, ping_, reports = site_ping.values()
+            id_, ping_, reports, state = site_ping.values()
             ping_ = list(map(float, [item for item in ping_.split(',') if item]))
             reports_r = 0
             if reports and reports is not None:
