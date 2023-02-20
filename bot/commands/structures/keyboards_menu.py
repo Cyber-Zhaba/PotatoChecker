@@ -10,9 +10,6 @@ state_on_keyboard = InlineKeyboardMarkup(
             text="Получить отчет",
             callback_data="get_report")],
         [InlineKeyboardButton(
-            text="Избранные сайты",
-            callback_data="featured_sites")],
-        [InlineKeyboardButton(
             text="Сайт",
             url="https://google.com"
         )]

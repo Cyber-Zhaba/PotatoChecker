@@ -13,7 +13,6 @@ from commands.bot_commands import bot_commands
 from commands.about import about_command
 from commands.help import help_command
 from commands.start import start_command
-from commands.site import site_command
 from commands.login import (
     login_command,
     logout_command,
@@ -23,7 +22,6 @@ from commands.login import (
 
 from commands.menu_commands import menu_command_renamed
 from commands.menu_commands import call_get_report
-from commands.menu_commands import call_featured_sites
 from commands.menu_commands import call_back
 from commands.menu_commands import call_notifications_on
 from bot.config import bot
@@ -33,7 +31,6 @@ def register_all_handlers(dp):
     dp.register_message_handler(start_command, commands=['start'])
     dp.register_message_handler(help_command, commands=['help'])
     dp.register_message_handler(about_command, commands=['about'])
-    dp.register_message_handler(site_command, commands=['site'])
 
     dp.register_message_handler(login_command, commands=['login'])
     dp.register_message_handler(get_user_login, state=LoginForm.login)
@@ -43,8 +40,7 @@ def register_all_handlers(dp):
     dp.register_message_handler(menu_command_renamed, commands=['menu'])
     dp.register_callback_query_handler(call_notifications_on, lambda c: c.data == 'notification_on')
     dp.register_callback_query_handler(call_get_report, lambda c: c.data == 'get_report')
-    dp.register_callback_query_handler(call_featured_sites, lambda c: c.data == 'featured_sites')
-    dp.register_callback_query_handler(call_back, lambda c: c.data == 'back')
+    dp.register_callback_query_handler(call_back, lambda c: c.data == 'call_back')
 
 
 async def main():
@@ -69,16 +65,16 @@ async def main():
 def noticed():
     responce = requests.get('http://localhost:5000/api/telegram',
                             json={'type': 'get_data_for_notified_users'}).json()
-    print(responce)
     for user in responce.keys():
         if responce[user]['changed_sites']:
             websites = responce[user]['changed_sites']
-            print(websites, user)
+            id_telegram = int(user)
+            bot.send_message(id_telegram, ' '.join(websites))
 
 
 if __name__ == '__main__':
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(noticed, "interval", seconds=10)
+    scheduler.add_job(noticed, "interval", seconds=30)
     scheduler.start()
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())

@@ -57,9 +57,18 @@ class TelegramListResource(Resource):
 
             case 'change_notify':
                 user = self.session.query(User).filter(User.telegram_id == args['telegram_id']).first()
-                setattr(user, 'notify', (1, 0)[int(user.notify)])
+                print(int((1, 0)[int(user.notify)]))
+                setattr(user, 'notify', int((1, 0)[int(user.notify)]))
                 self.session.commit()
-                result = jsonify({'success': 'notify changed'})
+                result = jsonify({'success': int(user.notify)})
+
+            case 'check_login':
+                user = self.session.query(User).filter(User.telegram_id == args['telegram_id']).first()
+                print(user)
+                if user is None:
+                    result = jsonify({'status': 'not login'})
+                else:
+                    result = jsonify({'status': 'logged in'})
 
             case 'get_data_for_notified_users':
                 users = self.session.query(User).filter(User.notify == 1).all()
@@ -79,6 +88,22 @@ class TelegramListResource(Resource):
                                 result[user.telegram_id]['changed_sites'].append([site['name'],
                                                                                   self.condition(points[-1])])
                 result = jsonify(result)
+            case 'get_favourites':
+                user = self.session.query(User).filter(User.telegram_id == args['telegram_id']).first()
+                websites = get('http://localhost:5000/api/sites', json={
+                    'type': 'all_by_groups',
+                    'favourite_sites': user.favourite_sites
+                }).json()['favourite_sites']
+                result = {'favourite_sites': []}
+                for site in websites:
+                    points = get('http://localhost:5000/api/plot', json={
+                        'id_site': site['id']}).json()['plot']['points'].split(',')
+                    if len(points) >= 1:
+                        result['favourite_sites'].append([site['name'], self.condition(points[-1])])
+                    else:
+                        result['favourite_sites'].append([site['name'], 'Устанавливаем подключение'])
+                result = jsonify(result)
+
         return result
 
     @staticmethod
