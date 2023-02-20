@@ -4,18 +4,11 @@ from data import db_session
 from data.sites import Sites
 
 
-def abort_sites_not_found(index: int) -> None:
-    """Returns 404 ERROR if id not found"""
-    session = db_session.create_session()
-    sites = session.query(Sites).get(index)
-    if not sites:
-        abort(404, messsage="Site wasn't found")
-
-
 class SitesResource(Resource):
     def __init__(self) -> None:
         """Create sqldb parser"""
         self.parser = reqparse.RequestParser()
+        self.session = db_session.create_session()
         self.parser.add_argument('owner_id', required=False)
         self.parser.add_argument('link', required=False)
         self.parser.add_argument('description', required=False)
@@ -25,30 +18,30 @@ class SitesResource(Resource):
         self.parser.add_argument('feedback_id', required=False)
         self.parser.add_argument('type', required=False)
 
-    @staticmethod
-    def get(site_id: int) -> Response:
+    def abort_sites_not_found(self, index: int) -> None:
+        """Returns 404 ERROR if id not found"""
+        sites = self.session.query(Sites).get(index)
+        if not sites:
+            abort(404, messsage="Site wasn't found")
+
+    def get(self, site_id: int) -> Response:
         """API method get"""
-        abort_sites_not_found(site_id)
-        session = db_session.create_session()
-        sites = session.query(Sites).get(site_id)
+        self.abort_sites_not_found(site_id)
+        sites = self.session.query(Sites).get(site_id)
         return jsonify({'sites': sites.to_dict(rules=("-site", "-site"))})
 
-    @staticmethod
-    def delete(site_id: int) -> Response:
+    def delete(self, site_id: int) -> Response:
         """API method delete"""
-        abort_sites_not_found(site_id)
-        session = db_session.create_session()
-        sites = session.query(Sites).get(site_id)
-        session.delete(sites)
-        session.commit()
+        self.abort_sites_not_found(site_id)
+        sites = self.session.query(Sites).get(site_id)
+        self.session.delete(sites)
+        self.session.commit()
         return jsonify({'success': 'OK'})
 
     def put(self, site_id: int) -> Response:
-        abort_sites_not_found(site_id)
+        self.abort_sites_not_found(site_id)
         args = self.parser.parse_args()
-        session = db_session.create_session()
-
-        site = session.query(Sites).get(site_id)
+        site = self.session.query(Sites).get(site_id)
 
         match args['type']:
             case 'mod':
@@ -61,7 +54,7 @@ class SitesResource(Resource):
                     [item for item in filter(lambda x: x, (site.ids_feedbacks.split(',') + [args['feedback_id']]))])
                 setattr(site, 'ids_feedbacks', zheleboba)
 
-        session.commit()
+        self.session.commit()
         return jsonify({'success': 'OK'})
 
 
@@ -140,7 +133,6 @@ class SitesListResource(Resource):
     def post(self) -> Response:
         """API method post"""
         args = self.parser.parse_args()
-        session = db_session.create_session()
         sites = Sites(
             owner_id=args['owner_id'],
             name=args['name'],
@@ -150,24 +142,23 @@ class SitesListResource(Resource):
             check_time='',
             moderated=0
         )
-        session.add(sites)
-        session.commit()
+        self.session.add(sites)
+        self.session.commit()
         return jsonify({'success': 'OK'})
 
     def put(self) -> Response:
         args = self.parser.parse_args()
-        session = db_session.create_session()
         if args['type'] == 'report':
-            site = session.query(Sites).filter(Sites.name == args['name']).first()
+            site = self.session.query(Sites).filter(Sites.name == args['name']).first()
             if str(args['id']) not in site.reports.split(','):
                 setattr(site, 'reports', (
                     site.reports + ',' + args['id'] if site.reports else args['id']
                 ))
         else:
-            site = session.query(Sites).filter(Sites.name == args['name']).first()
-            zheleboba = site.ids_feedbacks.split(',')
-            zheleboba.remove(args['feedback_id'])
-            zheleboba = '' if len(zheleboba) == 0 else ','.join(zheleboba)
+            site = self.session.query(Sites).filter(Sites.name == args['name']).first()
+            feedbacks = site.ids_feedbacks.split(',')
+            feedbacks.remove(args['feedback_id'])
+            zheleboba = '' if len(feedbacks) == 0 else ','.join(feedbacks)
             setattr(site, 'ids_feedbacks', zheleboba)
-        session.commit()
+        self.session.commit()
         return jsonify({'success': 'OK'})
