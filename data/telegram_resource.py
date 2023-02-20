@@ -106,6 +106,13 @@ class TelegramListResource(Resource):
 
         return result
 
+    def put(self):
+        args = self.parser.parse_args()
+        user = self.session.query(User).filter(User.telegram_id == args['telegram_id'])
+        setattr(user, 'telegram_id', '')
+        self.session.commit()
+        return jsonify({'success': 'OK'})
+
     @staticmethod
     def condition(ping: str) -> str:
         ping = 100 - int(ping)
