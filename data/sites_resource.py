@@ -146,7 +146,6 @@ class SitesListResource(Resource):
             link=args['link'],
             ids_feedbacks='',
             ping='',
-            check_time='',
             moderated=0
         )
         self.session.add(sites)
