@@ -1,22 +1,13 @@
 from aiogram import types
-from aiogram.filters import CommandObject
-from aiogram.utils.keyboard import (
-    KeyboardButton, ReplyKeyboardBuilder
-)
 
 from bot.commands.bot_commands import bot_commands
 
 
-async def help_command(message: types.Message, command: CommandObject):
-    menu_builder = ReplyKeyboardBuilder()
-
-    menu_builder.add(
-        KeyboardButton(text='/help')
-    )
-
-    if command.args:
+async def help_command(message: types.Message):
+    command = message.get_args()
+    if command:
         for cmd in bot_commands:
-            if cmd[0] == command.args:
+            if cmd[0] == command:
                 return await message.answer(
                     f'{cmd[0]} - {cmd[1]}\n\n{cmd[2]}'
                 )
