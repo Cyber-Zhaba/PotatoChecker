@@ -21,12 +21,19 @@ class PlotResource(Resource):
     def put(self) -> Response:
         args = self.parser.parse_args()
         plot = self.session.query(Plot).get(args['id_site'])
+        if plot is not None:
+            new_points = plot.points + ',' + args['points'] if plot.points else args['points']
+            new_point_time = plot.point_time + ',' + args['point_time'] if plot.point_time else args['point_time']
 
-        new_points = plot.points + ',' + args['points'] if plot.points else args['points']
-        new_point_time = plot.point_time + ',' + args['point_time'] if plot.point_time else args['point_time']
-
-        setattr(plot, 'points', new_points)
-        setattr(plot, 'point_time', new_point_time)
+            setattr(plot, 'points', new_points)
+            setattr(plot, 'point_time', new_point_time)
+        else:
+            plot = Plot(
+                id_site=args['id_site'],
+                points=args['points'],
+                point_time=args['point_time'],
+            )
+            self.session.add(plot)
 
         self.session.commit()
 

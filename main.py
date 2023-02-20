@@ -23,7 +23,6 @@ from gevent import monkey
 from gevent.pywsgi import WSGIServer
 
 from data import db_session
-from data.feedbacks import Feedbacks
 from data.users import User
 from data.sites import Sites
 from data.users_resource import UsersResource, UsersListResource
@@ -48,8 +47,8 @@ login_manager.init_app(app)
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s [%(levelname)s]: %(message)s',
-    handlers=[logging.FileHandler("logs.log"), logging.StreamHandler(), ]
-)
+    handlers=[logging.FileHandler("logs.log"),
+              logging.StreamHandler(),])
 N = 0
 
 
@@ -210,7 +209,7 @@ def draw_graphic(website_id):
     """Address to draw graph of stability
     :var website_id: int, id of site to plot"""
     website = get(f'http://localhost:5000/api/plot', json={'id_site': website_id},
-               timeout=(2, 20)).json()['plot']
+                  timeout=(2, 20)).json()['plot']
     time = []
     reports = []
 
@@ -219,6 +218,8 @@ def draw_graphic(website_id):
         if delta <= datetime.timedelta(hours=8):
             time.append(datetime.datetime.strptime(tm, '%m/%d/%Y/%H/%M'))
             reports.append(float(ping_))
+        else:
+            break
 
     time.reverse()
     reports.reverse()
@@ -303,7 +304,6 @@ def add_website():
 
 @app.route('/moderation')
 def moderation():
-    # TODO design for moderation page
     """Moderation page(only admin)"""
     if current_user.id != 1:
         abort(403)
@@ -380,7 +380,6 @@ def add_to_favourite(website_name):
                            'favourite_sites': current_user.favourite_sites},
                      timeout=(2, 20))
     website_id = website_id.json()['sites']
-    # TODO check multiply addition
     if website_id:
         website_id = website_id[0]['id']
         put(f'http://localhost:5000/api/users/{current_user.id}',
@@ -403,7 +402,6 @@ def delete_from_favourites(website_name):
                      timeout=(2, 20))
     website_id = website_id.json()['sites']
     if website_id:
-        # TODO multiply deletion
         website_id = website_id[0]['id']
         put(f'http://localhost:5000/api/users/{current_user.id}',
             json={'type': 'delete',
@@ -432,24 +430,22 @@ def ping_websites():
         put(f'http://localhost:5000/api/sites/{res[0]}',
             json={'type': 'update_ping', 'ping': res[1], 'check_time': str(datetime.datetime.now())},
             timeout=(2, 20))
-    send_email(result)
+    # send_email(result)
 
     if (N := N + 1) % 5 == 0:
         logging.debug('Entered (N := N + 1) % 5 == 0')
         all_ping = get('http://localhost:5000/api/sites', json={'type': 'all_ping_clear'}).json()['sites']
         users_n = len(get('http://localhost:5000/api/users', json={'type': 'all'}).json()['users'])
 
-        print(all_ping)
-        print(users_n)
-
         for site_ping in all_ping:
             id_, ping_, reports = site_ping.values()
             ping_ = list(map(float, [item for item in ping_.split(',') if item]))
-            reports = reports.split(',')
+            reports_r = 0
+            if reports and reports is not None:
+                reports = reports.split(',')
+                reports_r = len(reports) / users_n
 
             ping_r = sum(ping_) / len(ping_) / 1000
-            reports_r = len(reports) / users_n
-
             point = (ping_r + reports_r) / 2
 
             if abs(ping_r - reports_r) >= 0.5:
@@ -474,9 +470,9 @@ if __name__ == '__main__':
 
     db_session.global_init("data/data.db")
 
-    # scheduler = BackgroundScheduler()
-    # scheduler.add_job(ping_websites, 'interval', seconds=90)
-    # scheduler.start()
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(ping_websites, 'interval', seconds=90)
+    scheduler.start()
 
     http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
     http.serve_forever()
