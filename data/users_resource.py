@@ -71,7 +71,8 @@ class UsersListResource(Resource):
             username=args['username'],
             name=args['name'],
             email=args['email'],
-            favourite_sites=''
+            favourite_sites='',
+            notify=0
         )
         users.set_password(args['password'])
         self.session.add(users)
