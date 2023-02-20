@@ -3,6 +3,7 @@ import smtplib
 from email.message import EmailMessage
 from requests import get
 import logging
+from scriptes.utilities import status
 
 
 def send_email(response: list) -> None:
@@ -23,20 +24,6 @@ def send_email(response: list) -> None:
                     flag = True
         if flag:
             send(user['email'], str(datetime.datetime.now()), websites)
-
-
-def status(ping: float) -> str:
-    if 0 <= ping < 40:
-        return 'Подключение Отличное'
-    if 40 <= ping < 150:
-        return 'Подключение Нормальное'
-    if 150 <= ping < 350:
-        return 'Подключение Плохое'
-    if 350 <= ping < 700:
-        return 'Подключение Очень плохое'
-    if 700 <= ping < 1000:
-        return 'Время соединения очень большое. На сервер возможно производиться атака'
-    return 'Время ожидания привышенно. Сервер недоступен'
 
 
 def send(email: list, date: str, websites: list) -> None:

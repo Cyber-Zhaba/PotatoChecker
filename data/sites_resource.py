@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
 from data import db_session
 from data.sites import Sites
+from sqlalchemy import func
 
 
 class SitesResource(Resource):
@@ -13,7 +14,7 @@ class SitesResource(Resource):
         self.parser.add_argument('link', required=False)
         self.parser.add_argument('description', required=False)
         self.parser.add_argument('ping', required=False)
-        self.parser.add_argument('check_time', required=False)
+        self.parser.add_argument('state', required=False)
         self.parser.add_argument('ids_feedback', required=False)
         self.parser.add_argument('feedback_id', required=False)
         self.parser.add_argument('type', required=False)
@@ -49,6 +50,7 @@ class SitesResource(Resource):
             case 'update_ping':
                 setattr(site, 'ping', ','.join(
                     [item for item in site.ping.split(',') + [args['ping']] if item]))
+                setattr(site, 'state', args['state'])
             case 'add_feedback':
                 zheleboba = ','.join(
                     [item for item in filter(lambda x: x, (site.ids_feedbacks.split(',') + [args['feedback_id']]))])
@@ -87,42 +89,47 @@ class SitesListResource(Resource):
                 sites_not_favourite = sites_set - favourite_sites_set
                 result = jsonify({
                     'favourite_sites': [item.to_dict(
-                        only=('name', 'id', 'link', 'ping')) for item in favourite_sites_set],
+                        only=('name', 'id', 'link', 'state')) for item in favourite_sites_set],
                     'not_favourite_sites': [item.to_dict(
-                        only=('name', 'id', 'link', 'ping')) for item in sites_not_favourite]
-                })
+                        only=('name', 'id', 'link', 'state')) for item in sites_not_favourite]})
             case 'sites_by_name':
-                sites_favourite = all_sites.filter(Sites.name.contains(args['name']),
-                                                   Sites.id.in_(favourite), Sites.moderated == 1).all()
-                sites_not_favourite = all_sites.filter(Sites.name.contains(args['name']),
-                                                       ~Sites.id.in_(favourite), Sites.moderated == 1).all()
-                result = jsonify({'favourite_sites': [item.to_dict(only=('name', 'id', 'link'))
+                args['name'] = args['name'].lower()
+                temp = set(all_sites.filter(Sites.moderated == 1).all())
+                sites_favourite = []
+                sites_not_favourite = []
+                for element in temp:
+                    if args['name'] in element.name.lower():
+                        if str(element.id) in favourite:
+                            sites_favourite.append(element)
+                        else:
+                            sites_not_favourite.append(element)
+                result = jsonify({'favourite_sites': [item.to_dict(only=('name', 'id', 'link', 'state'))
                                                       for item in sites_favourite],
-                                  'not_favourite_sites': [item.to_dict(only=('name', 'id', 'link'))
+                                  'not_favourite_sites': [item.to_dict(only=('name', 'id', 'link', 'state'))
                                                           for item in sites_not_favourite]})
             case 'all':
                 all_sites = self.session.query(Sites).filter(Sites.moderated == 1).all()
-                result = jsonify({'sites': [item.to_dict(only=('name', 'id', 'link')) for item in all_sites]})
+                result = jsonify({'sites': [item.to_dict(only=('name', 'id', 'link', 'state')) for item in all_sites]})
             case 'name':
                 name_sites = self.session.query(Sites).filter(Sites.name.contains(args['name']),
                                                               Sites.moderated == 1).all()
-                result = jsonify({'sites': [item.to_dict(only=('name', 'id', 'link')) for item in name_sites]})
+                result = jsonify({'sites': [item.to_dict(only=('name', 'id', 'link', 'state')) for item in name_sites]})
             case 'to_moderation':
                 mod = self.session.query(Sites).filter(Sites.moderated == 0).all()
                 result = jsonify({'sites': [item.to_dict(rules=("-site", "-site")) for item in mod]})
             case 'strict_name':
                 strict = self.session.query(Sites).filter(Sites.name == args['name'])
                 result = jsonify({'sites': [item.to_dict(
-                    only=('name', 'id', 'link', 'ids_feedbacks')) for item in strict]})
+                    only=('name', 'id', 'link', 'ids_feedbacks', 'state')) for item in strict]})
             case 'feedback_in_site':
                 site = self.session.query(Sites).all()
                 for i in site:
                     if args['feedback_id'] in i.ids_feedbacks.split(','):
                         site = i
-                result = jsonify({'sites': [site.to_dict(only=('name', 'id', 'link', 'ids_feedbacks'))]})
+                result = jsonify({'sites': [site.to_dict(only=('name', 'id', 'link', 'ids_feedbacks', 'state'))]})
             case 'all_ping_clear':
                 all_ping = self.session.query(Sites).filter(Sites.moderated == 1).all()
-                result = jsonify({'sites': [site.to_dict(only=('id', 'ping', 'reports')) for site in all_ping]})
+                result = jsonify({'sites': [site.to_dict(only=('id', 'ping', 'reports', 'state')) for site in all_ping]})
                 for site in all_ping:
                     setattr(site, 'ping', '')
                     setattr(site, 'reports', '')

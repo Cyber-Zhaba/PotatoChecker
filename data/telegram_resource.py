@@ -3,7 +3,7 @@ from flask import jsonify, Response
 from data import db_session
 from data.users import User
 from requests import get
-
+from scriptes.utilities import status
 
 class TelegramResource(Resource):
     def __init__(self) -> None:
@@ -61,23 +61,9 @@ class TelegramListResource(Resource):
 
                 result = jsonify({'sites': [
                     (item['name'], item['link'], (
-                        self.status(float(item['ping'].split(',')[-1])) if item['ping'] else mess
+                        status(float(item['ping'].split(',')[-1])) if item['ping'] else mess
                     )) for item in websites
                 ]})
 
         return result
-
-    @staticmethod
-    def status(ping: float) -> str:
-        if 0 <= ping < 40:
-            return 'Подключение Отличное'
-        if 40 <= ping < 150:
-            return 'Подключение Нормальное'
-        if 150 <= ping < 350:
-            return 'Подключение Плохое'
-        if 350 <= ping < 700:
-            return 'Подключение Очень плохое'
-        if 700 <= ping < 1000:
-            return 'Время соединения очень большое. На сервер возможно производиться атака'
-        return 'Время ожидания привышенно. Сервер недоступен'
 

@@ -8,6 +8,7 @@ from pythonping import ping
 from apscheduler.schedulers.background import BackgroundScheduler
 from scriptes.availability_checker import ping_website
 from scriptes.email import send_email
+from scriptes.utilities import status
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
@@ -48,7 +49,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s [%(levelname)s]: %(message)s',
     handlers=[logging.FileHandler("logs.log"),
-              logging.StreamHandler(),])
+              logging.StreamHandler(), ])
 N = 0
 
 
@@ -148,7 +149,7 @@ def personal_account(search):
         comment_title = 'Добавьте отзыв:'
     if request.method == "POST":
         if form.validate_on_submit():
-            search = form.name.data
+            search = form.name.data.lower()
             flag_finder = True
         if form_2.validate_on_submit():
             if form_2.content.data != '':
@@ -171,10 +172,8 @@ def personal_account(search):
         req = {'type': 'sites_by_name', 'name': search,
                'favourite_sites': current_user.favourite_sites}
     answer = get('http://localhost:5000/api/sites', json=req, timeout=(2, 20)).json()
-
     favourite_sites_names = answer['favourite_sites']
     not_favourite_sites_names = answer['not_favourite_sites']
-    db_sess = db_session.create_session()
     if not flag_finder:
         answer = get('http://localhost:5000/api/sites',
                      json={'type': 'strict_name',
@@ -217,7 +216,7 @@ def draw_graphic(website_id):
         delta = datetime.datetime.now() - datetime.datetime.strptime(tm, '%m/%d/%Y/%H/%M')
         if delta <= datetime.timedelta(hours=8):
             time.append(datetime.datetime.strptime(tm, '%m/%d/%Y/%H/%M'))
-            reports.append(float(ping_))
+            reports.append(100 - int(ping_))
         else:
             break
 
@@ -246,7 +245,7 @@ def draw_graphic(website_id):
     axes.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
 
     axes.xaxis.set_major_formatter(dates.DateFormatter('%m.%d %H:%M'))
-    axes.xaxis.set_major_locator(dates.DayLocator(interval=1))
+    # axes.xaxis.set_major_locator(dates.DayLocator(interval=1))
 
     axes.plot(time, reports, color='#0f497f')
 
@@ -415,7 +414,7 @@ def ping_websites():
     global N
     logging.info(f'N = {N + 1}')
 
-    count, timeout = 1, 1
+    count, timeout = 1, 0.5
 
     logging.debug('made response for ping')
     websites = get('http://localhost:5000/api/sites', json={'type': 'all'}, timeout=(2, 20)).json()["sites"]
@@ -428,7 +427,7 @@ def ping_websites():
 
     for res in result:
         put(f'http://localhost:5000/api/sites/{res[0]}',
-            json={'type': 'update_ping', 'ping': res[1], 'check_time': str(datetime.datetime.now())},
+            json={'type': 'update_ping', 'ping': res[1], 'state': status(res[1])},
             timeout=(2, 20))
     # send_email(result)
 
@@ -445,7 +444,7 @@ def ping_websites():
                 reports = reports.split(',')
                 reports_r = len(reports) / users_n
 
-            ping_r = sum(ping_) / len(ping_) / 1000
+            ping_r = sum(ping_) / len(ping_) / 500
             point = (ping_r + reports_r) / 2
 
             if abs(ping_r - reports_r) >= 0.5:
