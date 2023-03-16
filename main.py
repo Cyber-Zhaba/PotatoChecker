@@ -143,19 +143,17 @@ def personal_account(search):
     feedbacks, users = [], {}
     image_name = f'{current_user.name}.png' if search is not None and request != 'POST' else None
     flag_finder = False
-    try:
-        a = request.args['messages']
+    a = request.args.get('messages')
+    if a is not None:
         submit_comment_btn = 'Редактировать отзыв'
         comment_title = 'Редактируйте отзыв:'
-    except Exception:
+    else:
         submit_comment_btn = 'Добавить отзыв'
         comment_title = 'Добавьте отзыв:'
     if request.method == "GET":
-        try:
-            a = request.args['messages']
+        a = request.args.get('messages')
+        if a is not None:
             form_2.content.data = a.split(':')[1][2:-2]
-        except Exception:
-            pass
     if request.method == "POST":
         if form.validate_on_submit():
             search = form.name.data.lower()
