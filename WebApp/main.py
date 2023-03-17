@@ -140,7 +140,7 @@ def personal_account(search):
 
     if request.method == "GET":
         if 'messages' in request.args:
-            form_2.content.data = request.args['messages'].split(':')[1][2:-2]
+            form_2.content.data = request.args['messages']
 
     if request.method == "POST":
         if form.validate_on_submit():
@@ -339,7 +339,7 @@ def edit_comment(feedback_id):
            'feedback_id': str(feedback_id)}
     site = get('http://localhost:5000/api/sites', json=req).json()
     feedback = get(f'http://localhost:5000/api/feedback/{feedback_id}').json()
-    messages = json.dumps({"content": feedback['sites']['content']}).encode('utf8')
+    messages = feedback['sites']['content']
     name = site["sites"][0]["name"]
     put('http://localhost:5000/api/sites',
         json={'type': '',
