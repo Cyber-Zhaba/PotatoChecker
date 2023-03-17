@@ -476,5 +476,142 @@ if __name__ == '__main__':
     cfg_path = ('../' if getcwd().split('\\')[-1] == 'WebApp' else '') + 'config.cfg'
     config.read(cfg_path)
 
+    if config['FlaskWebApp']['first_setup'] == '1':
+        config.set('FlaskWebApp', 'first_setup', '0')
+        with open(cfg_path, 'w') as file:
+            config.write(file)
+
+        session = db_session.create_session()
+
+        user = User()
+        user.name, user.username = 'Admin', config['FlaskWebApp']['admin_login']
+        user.email = config['FlaskWebApp']['admin_email']
+        user.set_password(config['FlaskWebApp']['admin_password'])
+
+        current_time = datetime.datetime.now().strftime('%m/%d/%Y/%H/%M')
+
+        sites_1 = Sites(
+            owner_id=1,
+            name='МГУ',
+            link='msu.ru',
+            ids_feedbacks='',
+            ping=f'{ping_website((1, "msu.ru", 0, 0, 1, 0.5))}',
+            moderated=1
+        )
+
+        point_1 = Plot(
+            id_site=1,
+            points='11',
+            point_time=current_time
+        )
+
+        sites_2 = Sites(
+            owner_id=1,
+            name='МФТИ',
+            link='mipt.ru',
+            ids_feedbacks='',
+            ping=f'{ping_website((2, "mipt.ru", 0, 0, 1, 0.5))}',
+            moderated=1
+        )
+
+        point_2 = Plot(
+            id_site=2,
+            points='11',
+            point_time=current_time
+        )
+
+        sites_3 = Sites(
+            owner_id=1,
+            name='МФЮА',
+            link='mfua.ru',
+            ids_feedbacks='',
+            ping=f'{ping_website((3, "mfua.ru", 0, 0, 1, 0.5))}',
+            moderated=1
+        )
+
+        point_3 = Plot(
+            id_site=3,
+            points='61',
+            point_time=current_time
+        )
+
+        sites_4 = Sites(
+            owner_id=1,
+            name='МЭИ',
+            link='mpei.ru',
+            ids_feedbacks='',
+            ping=f'{ping_website((4, "mpei.ru", 0, 0, 1, 0.5))}',
+            moderated=1
+        )
+
+        point_4 = Plot(
+            id_site=4,
+            points='11',
+            point_time=current_time
+        )
+
+        sites_5 = Sites(
+            owner_id=1,
+            name='ВШЭ',
+            link='hse.ru',
+            ids_feedbacks='',
+            ping=f'{ping_website((5, "hse.ru", 0, 0, 1, 0.5))}',
+            moderated=1
+        )
+
+        point_5 = Plot(
+            id_site=5,
+            points='11',
+            point_time=current_time
+        )
+
+        sites_6 = Sites(
+            owner_id=1,
+            name='МИСИС',
+            link='misis.ru',
+            ids_feedbacks='',
+            ping=f'{ping_website((6, "misis.ru", 0, 0, 1, 0.5))}',
+            moderated=1
+        )
+
+        point_6 = Plot(
+            id_site=6,
+            points='21',
+            point_time=current_time
+        )
+
+        sites_7 = Sites(
+            owner_id=1,
+            name='МГТУ им. Н. Э. Баумана',
+            link='bmstu.ru',
+            ids_feedbacks='',
+            ping=f'{ping_website((7, "bmstu.ru", 0, 0, 1, 0.5))}',
+            moderated=1
+        )
+
+        point_7 = Plot(
+            id_site=7,
+            points='11',
+            point_time=current_time
+        )
+
+        session.add(user)
+        session.add(sites_1)
+        session.add(point_1)
+        session.add(sites_2)
+        session.add(point_2)
+        session.add(sites_3)
+        session.add(point_3)
+        session.add(sites_4)
+        session.add(point_4)
+        session.add(sites_5)
+        session.add(point_5)
+        session.add(sites_6)
+        session.add(point_6)
+        session.add(sites_7)
+        session.add(point_7)
+
+        session.commit()
+
     http = WSGIServer((config['FlaskWebApp']['serverIP'], int(config['FlaskWebApp']['serverPORT'])), app.wsgi_app)
     http.serve_forever()
