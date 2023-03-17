@@ -1,9 +1,7 @@
 """Flask main server file"""
 import configparser
 import datetime
-import json
 import logging
-import sys
 from os import getcwd
 
 import matplotlib.dates as dates
