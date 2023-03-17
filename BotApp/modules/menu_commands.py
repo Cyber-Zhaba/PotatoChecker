@@ -1,9 +1,8 @@
 import requests
 from aiogram import types
-from aiogram.dispatcher import FSMContext
 
-from bot.commands.structures.keyboards_menu import state_on_keyboard, back_keyboard
-from bot.config import bot
+from bot_cfg import bot
+from keyboards_menu import state_on_keyboard, back_keyboard
 
 
 async def menu_command_renamed(message: types.Message):

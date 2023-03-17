@@ -1,0 +1,40 @@
+2023-03-16 20:06:26,945 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-16 20:06:26,946 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-16 20:06:26,946 [INFO]: Scheduler started
+2023-03-16 20:06:26,954 [DEBUG]: Looking for jobs to run
+2023-03-16 20:06:26,955 [DEBUG]: Next wakeup is due at 2023-03-16 20:07:56.945909+03:00 (in 89.991024 seconds)
+2023-03-16 20:10:34,317 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-16 20:10:34,318 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-16 20:10:34,318 [INFO]: Scheduler started
+2023-03-16 20:10:34,326 [DEBUG]: Looking for jobs to run
+2023-03-16 20:10:34,326 [DEBUG]: Next wakeup is due at 2023-03-16 20:12:04.317248+03:00 (in 89.991025 seconds)
+2023-03-16 20:11:11,920 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-16 20:11:11,921 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-16 20:11:11,921 [INFO]: Scheduler started
+2023-03-16 20:11:11,928 [DEBUG]: Looking for jobs to run
+2023-03-16 20:11:11,928 [DEBUG]: Next wakeup is due at 2023-03-16 20:12:41.920401+03:00 (in 89.992026 seconds)
+2023-03-16 20:12:27,560 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-16 20:12:27,561 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-16 20:12:27,561 [INFO]: Scheduler started
+2023-03-16 20:12:27,569 [DEBUG]: Looking for jobs to run
+2023-03-16 20:12:27,570 [DEBUG]: Next wakeup is due at 2023-03-16 20:13:57.560740+03:00 (in 89.990034 seconds)
+2023-03-16 20:12:51,136 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-16 20:12:51,137 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-16 20:12:51,137 [INFO]: Scheduler started
+2023-03-16 20:12:51,145 [DEBUG]: Looking for jobs to run
+2023-03-16 20:12:51,145 [DEBUG]: Next wakeup is due at 2023-03-16 20:14:21.136113+03:00 (in 89.991028 seconds)
+2023-03-16 20:13:02,877 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-16 20:13:02,878 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-16 20:13:02,878 [INFO]: Scheduler started
+2023-03-16 20:13:02,887 [DEBUG]: Looking for jobs to run
+2023-03-16 20:13:02,887 [DEBUG]: Next wakeup is due at 2023-03-16 20:14:32.877814+03:00 (in 89.990058 seconds)
+2023-03-16 20:14:54,099 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-16 20:14:54,100 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-16 20:14:54,100 [INFO]: Scheduler started
+2023-03-16 20:14:54,108 [DEBUG]: Looking for jobs to run
+2023-03-16 20:14:54,108 [DEBUG]: Next wakeup is due at 2023-03-16 20:16:24.099495+03:00 (in 89.991084 seconds)
+2023-03-16 20:15:11,779 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-16 20:15:11,780 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-16 20:15:11,781 [INFO]: Scheduler started
+2023-03-16 20:15:11,789 [DEBUG]: Looking for jobs to run
+2023-03-16 20:15:11,789 [DEBUG]: Next wakeup is due at 2023-03-16 20:16:41.779992+03:00 (in 89.990049 seconds)

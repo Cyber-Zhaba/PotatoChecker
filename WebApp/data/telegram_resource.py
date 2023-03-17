@@ -1,10 +1,9 @@
-from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
-from data import db_session
-from data.users import User
-from data.sites import Sites
+from flask_restful import Resource, reqparse, abort
 from requests import get
-from scriptes.utilities import status
+
+import db_session
+from users import User
 
 
 class TelegramResource(Resource):
@@ -84,7 +83,7 @@ class TelegramListResource(Resource):
                             'id_site': site['id']}).json()['plot']['points'].split(',')
                         if len(points) >= 2:
                             result[user.telegram_id]['favourite_sites'].append([site['name'], self.condition(points[-1])])
-                            if self.condition(points[-1]) != self.condition(points[2]):
+                            if self.condition(points[-1]) != self.condition(points[-2]):
                                 result[user.telegram_id]['changed_sites'].append([site['name'],
                                                                                   self.condition(points[-1])])
                 result = jsonify(result)

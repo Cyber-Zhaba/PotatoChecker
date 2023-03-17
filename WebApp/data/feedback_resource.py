@@ -1,7 +1,8 @@
-from flask_restful import Resource, reqparse, abort
 from flask import jsonify
-from data import db_session
-from data.feedbacks import Feedbacks
+from flask_restful import Resource, reqparse, abort
+
+import db_session
+from feedbacks import Feedbacks
 
 
 class FeedbackResource(Resource):

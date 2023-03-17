@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
-from data import db_session
-from data.users import User
+import db_session
+from users import User
 
 
 class UsersResource(Resource):

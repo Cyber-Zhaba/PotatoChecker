@@ -2,7 +2,7 @@ import requests
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from bot.commands.structures.states import LoginForm
+from states import LoginForm
 
 
 async def login_command(message: types.Message, state: FSMContext) -> None:

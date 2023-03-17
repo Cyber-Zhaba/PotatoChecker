@@ -1,41 +1,29 @@
 """Flask main server file"""
-import asyncio
+import configparser
 import datetime
 import json
-from multiprocessing import Pool
-from pythonping import ping
-
-from apscheduler.schedulers.background import BackgroundScheduler
-from scriptes.availability_checker import ping_website
-from scriptes.email import send_email
-from scriptes.utilities import status
-
-import matplotlib.pyplot as plt
-import matplotlib.dates as dates
 import logging
+import sys
+from os import getcwd
 
-from flask import Flask, request, Response, session, url_for
+import matplotlib.dates as dates
+import matplotlib.pyplot as plt
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask, request, url_for
 from flask import render_template, redirect
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_restful import Api, abort
-
-from requests import get, post, delete, put
 from gevent import monkey
 from gevent.pywsgi import WSGIServer
+from requests import get, post, delete, put
 
-from data import db_session
-from data.users import User
-from data.sites import Sites
-from data.users_resource import UsersResource, UsersListResource
-from data.sites_resource import SitesResource, SitesListResource
-from data.feedback_resource import FeedbackResource, FeedbackListResource
-from data.telegram_resource import TelegramResource, TelegramListResource
-from data.plot_resource import PlotResource
-
-from forms.registration_forms import RegisterForm, LoginForm
-from forms.comment_form import CommentForm
+from data.__init__ import *
 from forms.add_website_forms import AddWebsiteForm
+from forms.comment_form import CommentForm
+from forms.registration_forms import RegisterForm, LoginForm
 from forms.util_forms import NameWebSiteForm
+from scripts.availability_checker import ping_website
+from scripts.utilities import status
 
 monkey.patch_all()
 UPLOAD_FOLDER = '/static/img'
@@ -143,17 +131,17 @@ def personal_account(search):
     feedbacks, users = [], {}
     image_name = f'{current_user.name}.png' if search is not None and request != 'POST' else None
     flag_finder = False
-    a = request.args.get('messages')
-    if a is not None:
+    submit_comment_btn = 'Добавить отзыв'
+    comment_title = 'Добавьте отзыв:'
+
+    if 'messages' in request.args:
         submit_comment_btn = 'Редактировать отзыв'
         comment_title = 'Редактируйте отзыв:'
-    else:
-        submit_comment_btn = 'Добавить отзыв'
-        comment_title = 'Добавьте отзыв:'
+
     if request.method == "GET":
-        a = request.args.get('messages')
-        if a is not None:
-            form_2.content.data = a.split(':')[1][2:-2]
+        if 'messages' in request.args:
+            form_2.content.data = request.args['messages'].split(':')[1][2:-2]
+
     if request.method == "POST":
         if form.validate_on_submit():
             search = form.name.data.lower()
@@ -241,7 +229,7 @@ def draw_graphic(website_id):
     axes.tick_params(axis='both', colors='white')
 
     axes.set_xlabel('Часы', color='white', size='13')
-    axes.set_ylabel('Пинг', color='white', size='13')
+    axes.set_ylabel('Эффективность', color='white', size='13')
 
     axes.spines['left'].set_color('white')
     axes.spines['bottom'].set_color('white')
@@ -252,12 +240,14 @@ def draw_graphic(website_id):
     axes.grid(linestyle='dashdot', linewidth=1, alpha=0.3)
 
     axes.xaxis.set_major_formatter(dates.DateFormatter('%m.%d %H:%M'))
-    # axes.xaxis.set_major_locator(dates.DayLocator(interval=1))
 
     axes.plot(time, reports, color='#0f497f')
 
+    plt.ylim([0, 100])
+
     plt.gcf().autofmt_xdate()
-    fig.savefig(f'static/img/{current_user.name}.png', dpi=200)
+    png_path = ('WebApp' if getcwd().split('\\')[-1] != 'WebApp' else '') + f'/static/img/{current_user.name}.png'
+    fig.savefig(png_path, dpi=200)
     return redirect(f'/personal_account/{name}')
 
 
@@ -474,11 +464,20 @@ if __name__ == '__main__':
 
     api.add_resource(PlotResource, '/api/plot')
 
-    db_session.global_init("data/data.db")
+    if sys.platform.startswith('win'):
+        db_path = ('WebApp' if getcwd().split('\\')[-1] != 'WebApp' else '') + r'\data\data.db'
+    else:
+        db_path = ('WebApp' if getcwd().split(r'/')[-1] != 'WebApp' else '') + r'/data/data.db'
+
+    db_session.global_init(db_path)
 
     scheduler = BackgroundScheduler()
     scheduler.add_job(ping_websites, 'interval', seconds=90)
     scheduler.start()
 
-    http = WSGIServer(('0.0.0.0', 5000), app.wsgi_app)
+    config = configparser.ConfigParser()
+    cfg_path = ('../' if getcwd().split('\\')[-1] == 'WebApp' else '') + 'config.cfg'
+    config.read(cfg_path)
+
+    http = WSGIServer((config['FlaskWebApp']['serverIP'], int(config['FlaskWebApp']['serverPORT'])), app.wsgi_app)
     http.serve_forever()

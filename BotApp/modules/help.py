@@ -1,6 +1,6 @@
 from aiogram import types
 
-from bot.commands.bot_commands import bot_commands
+from bot_commands import bot_commands
 
 
 async def help_command(message: types.Message):
@@ -15,6 +15,6 @@ async def help_command(message: types.Message):
             return await message.answer('Команда не найдена')
 
     return await message.answer(
-        'Помощь и справка о боте'
-        'Для того, чтобы получить информацию о команде используйте /help <команда>'
+        'Помощь и справка о боте:\n'
+        'Для того, чтобы получить информацию о команде используйте /help команда'
     )

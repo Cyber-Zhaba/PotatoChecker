@@ -1,7 +1,8 @@
-from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
-from data import db_session
-from data.plot import Plot
+from flask_restful import Resource, reqparse
+
+import db_session
+from plot import Plot
 
 
 class PlotResource(Resource):

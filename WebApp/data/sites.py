@@ -1,6 +1,7 @@
 import sqlalchemy
 from sqlalchemy_serializer import SerializerMixin
-from data.db_session import SqlAlchemyBase
+
+from db_session import SqlAlchemyBase
 
 
 class Sites(SqlAlchemyBase, SerializerMixin):

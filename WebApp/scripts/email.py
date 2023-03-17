@@ -1,9 +1,10 @@
 import datetime
 import smtplib
-from email.message import EmailMessage
-from requests import get
 import logging
-from scriptes.utilities import status
+from email.message import EmailMessage
+
+from requests import get
+from utilities import status
 
 
 def send_email(response: list) -> None:

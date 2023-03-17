@@ -1,0 +1,450 @@
+2023-03-17 15:36:53,777 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-17 15:36:53,779 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-17 15:36:53,779 [INFO]: Scheduler started
+2023-03-17 15:36:53,781 [DEBUG]: Looking for jobs to run
+2023-03-17 15:36:53,781 [DEBUG]: Next wakeup is due at 2023-03-17 15:38:23.776782+03:00 (in 89.995220 seconds)
+2023-03-17 15:38:23,881 [DEBUG]: Looking for jobs to run
+2023-03-17 15:38:23,881 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:38:23 MSK)" (scheduled at 2023-03-17 15:38:23.776782+03:00)
+2023-03-17 15:38:23,881 [INFO]: N = 1
+2023-03-17 15:38:23,881 [DEBUG]: made response for ping
+2023-03-17 15:38:23,883 [DEBUG]: Next wakeup is due at 2023-03-17 15:39:53.776782+03:00 (in 89.895513 seconds)
+2023-03-17 15:38:23,883 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:38:23,893 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:38:23,893 [DEBUG]: []
+2023-03-17 15:38:23,894 [INFO]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:39:53 MSK)" executed successfully
+2023-03-17 15:39:53,867 [DEBUG]: Looking for jobs to run
+2023-03-17 15:39:53,868 [DEBUG]: Next wakeup is due at 2023-03-17 15:41:23.776782+03:00 (in 89.908912 seconds)
+2023-03-17 15:39:53,868 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:41:23 MSK)" (scheduled at 2023-03-17 15:39:53.776782+03:00)
+2023-03-17 15:39:53,868 [INFO]: N = 2
+2023-03-17 15:39:53,868 [DEBUG]: made response for ping
+2023-03-17 15:39:53,870 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:39:53,874 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:39:53,875 [DEBUG]: []
+2023-03-17 15:39:53,875 [INFO]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:41:23 MSK)" executed successfully
+2023-03-17 15:41:23,867 [DEBUG]: Looking for jobs to run
+2023-03-17 15:41:23,868 [DEBUG]: Next wakeup is due at 2023-03-17 15:42:53.776782+03:00 (in 89.908641 seconds)
+2023-03-17 15:41:23,868 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:42:53 MSK)" (scheduled at 2023-03-17 15:41:23.776782+03:00)
+2023-03-17 15:41:23,869 [INFO]: N = 3
+2023-03-17 15:41:23,869 [DEBUG]: made response for ping
+2023-03-17 15:41:23,871 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:41:23,880 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:41:23,881 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:42:53 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:42:36,516 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-17 15:42:36,518 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-17 15:42:36,519 [INFO]: Scheduler started
+2023-03-17 15:42:36,520 [DEBUG]: Looking for jobs to run
+2023-03-17 15:42:36,520 [DEBUG]: Next wakeup is due at 2023-03-17 15:44:06.516615+03:00 (in 89.996259 seconds)
+2023-03-17 15:42:53,834 [DEBUG]: Looking for jobs to run
+2023-03-17 15:42:53,835 [DEBUG]: Next wakeup is due at 2023-03-17 15:44:23.776782+03:00 (in 89.941667 seconds)
+2023-03-17 15:42:53,835 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:44:23 MSK)" (scheduled at 2023-03-17 15:42:53.776782+03:00)
+2023-03-17 15:42:53,836 [INFO]: N = 3
+2023-03-17 15:42:53,836 [DEBUG]: made response for ping
+2023-03-17 15:42:53,838 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:42:53,845 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:42:53,846 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:44:23 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:44:23,868 [DEBUG]: Looking for jobs to run
+2023-03-17 15:44:23,870 [DEBUG]: Next wakeup is due at 2023-03-17 15:45:53.776782+03:00 (in 89.907618 seconds)
+2023-03-17 15:44:23,872 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:45:53 MSK)" (scheduled at 2023-03-17 15:44:23.776782+03:00)
+2023-03-17 15:44:23,873 [INFO]: N = 3
+2023-03-17 15:44:23,874 [DEBUG]: made response for ping
+2023-03-17 15:44:23,881 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:44:23,916 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:44:23,922 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:45:53 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:45:53,878 [DEBUG]: Looking for jobs to run
+2023-03-17 15:45:53,880 [DEBUG]: Next wakeup is due at 2023-03-17 15:47:23.776782+03:00 (in 89.897851 seconds)
+2023-03-17 15:45:53,881 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:47:23 MSK)" (scheduled at 2023-03-17 15:45:53.776782+03:00)
+2023-03-17 15:45:53,882 [INFO]: N = 3
+2023-03-17 15:45:53,883 [DEBUG]: made response for ping
+2023-03-17 15:45:53,890 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:45:53,910 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:45:53,914 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:47:23 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:47:23,820 [DEBUG]: Looking for jobs to run
+2023-03-17 15:47:23,821 [DEBUG]: Next wakeup is due at 2023-03-17 15:48:53.776782+03:00 (in 89.955711 seconds)
+2023-03-17 15:47:23,821 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:48:53 MSK)" (scheduled at 2023-03-17 15:47:23.776782+03:00)
+2023-03-17 15:47:23,821 [INFO]: N = 3
+2023-03-17 15:47:23,821 [DEBUG]: made response for ping
+2023-03-17 15:47:23,822 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:47:23,825 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:47:23,825 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:48:53 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:48:53,868 [DEBUG]: Looking for jobs to run
+2023-03-17 15:48:53,869 [DEBUG]: Next wakeup is due at 2023-03-17 15:50:23.776782+03:00 (in 89.908088 seconds)
+2023-03-17 15:48:53,869 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:50:23 MSK)" (scheduled at 2023-03-17 15:48:53.776782+03:00)
+2023-03-17 15:48:53,869 [INFO]: N = 3
+2023-03-17 15:48:53,869 [DEBUG]: made response for ping
+2023-03-17 15:48:53,871 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:48:53,877 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:48:53,879 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:50:23 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:50:23,793 [DEBUG]: Looking for jobs to run
+2023-03-17 15:50:23,794 [DEBUG]: Next wakeup is due at 2023-03-17 15:51:53.776782+03:00 (in 89.982394 seconds)
+2023-03-17 15:50:23,795 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:51:53 MSK)" (scheduled at 2023-03-17 15:50:23.776782+03:00)
+2023-03-17 15:50:23,795 [INFO]: N = 3
+2023-03-17 15:50:23,795 [DEBUG]: made response for ping
+2023-03-17 15:50:23,797 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:50:23,805 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:50:23,805 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:51:53 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:51:50,124 [ERROR]: Exception on /api/telegram [GET]
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 748, in do_execute
+sqlite3.OperationalError: no such table: users
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1823, in full_dispatch_request
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1799, in dispatch_request
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_restful/__init__.py", line 467, in wrapper
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/views.py", line 107, in view
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_restful/__init__.py", line 582, in dispatch_request
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/data/telegram_resource.py", line 73, in get
+    users = self.session.query(User).filter(User.notify == 1).all()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2697, in all
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2855, in _iter
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2229, in execute
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2124, in _execute_internal
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/orm/context.py", line 253, in orm_execute_statement
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1414, in execute
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/sql/elements.py", line 486, in _execute_on_connection
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1842, in _execute_context
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 2326, in _handle_dbapi_exception
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 748, in do_execute
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: users
+[SQL: SELECT users.id AS users_id, users.username AS users_username, users.name AS users_name, users.email AS users_email, users.hashed_password AS users_hashed_password, users.favourite_sites AS users_favourite_sites, users.telegram_id AS users_telegram_id, users.notify AS users_notify 
+FROM users 
+WHERE users.notify = ?]
+[parameters: (1,)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2023-03-17 15:51:53,784 [DEBUG]: Looking for jobs to run
+2023-03-17 15:51:53,785 [DEBUG]: Next wakeup is due at 2023-03-17 15:53:23.776782+03:00 (in 89.991965 seconds)
+2023-03-17 15:51:53,785 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:53:23 MSK)" (scheduled at 2023-03-17 15:51:53.776782+03:00)
+2023-03-17 15:51:53,785 [INFO]: N = 3
+2023-03-17 15:51:53,786 [DEBUG]: made response for ping
+2023-03-17 15:51:53,788 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:51:53,794 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:51:53,795 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:53:23 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:53:23,846 [DEBUG]: Looking for jobs to run
+2023-03-17 15:53:23,847 [DEBUG]: Next wakeup is due at 2023-03-17 15:54:53.776782+03:00 (in 89.929876 seconds)
+2023-03-17 15:53:23,847 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:54:53 MSK)" (scheduled at 2023-03-17 15:53:23.776782+03:00)
+2023-03-17 15:53:23,848 [INFO]: N = 3
+2023-03-17 15:53:23,848 [DEBUG]: made response for ping
+2023-03-17 15:53:23,850 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:53:23,857 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:53:23,857 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:54:53 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:54:13,449 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-17 15:54:13,451 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-17 15:54:13,451 [INFO]: Scheduler started
+2023-03-17 15:54:13,451 [DEBUG]: Looking for jobs to run
+2023-03-17 15:54:13,452 [DEBUG]: Next wakeup is due at 2023-03-17 15:55:43.449561+03:00 (in 89.997431 seconds)
+2023-03-17 15:54:28,282 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:54:28,316 [DEBUG]: http://localhost:5000 "GET /api/users HTTP/1.1" 200 13
+2023-03-17 15:54:28,325 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:54:28,356 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:54:33,804 [ERROR]: Exception on /favicon.ico [GET]
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_login/utils.py", line 285, in decorated_view
+    return current_app.login_manager.unauthorized()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_login/login_manager.py", line 178, in unauthorized
+    abort(401)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/helpers.py", line 310, in abort
+    current_app.aborter(code, *args, **kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/werkzeug/exceptions.py", line 864, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.Unauthorized: 401 Unauthorized: The server could not verify that you are authorized to access the URL requested. You either supplied the wrong credentials (e.g. a bad password), or your browser doesn't understand how to supply the credentials required.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 2528, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_restful/__init__.py", line 271, in error_router
+    return original_handler(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1669, in handle_user_exception
+    return self.handle_http_exception(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1609, in handle_http_exception
+    return self.ensure_sync(handler)(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 46, in log_redirect
+    print(error)
+OSError: [Errno 5] Input/output error
+2023-03-17 15:54:53,801 [DEBUG]: Looking for jobs to run
+2023-03-17 15:54:53,803 [DEBUG]: Next wakeup is due at 2023-03-17 15:56:23.776782+03:00 (in 89.974604 seconds)
+2023-03-17 15:54:53,805 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:56:23 MSK)" (scheduled at 2023-03-17 15:54:53.776782+03:00)
+2023-03-17 15:54:53,806 [INFO]: N = 3
+2023-03-17 15:54:53,807 [DEBUG]: made response for ping
+2023-03-17 15:54:53,817 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:54:53,854 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:54:53,860 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:56:23 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:56:23,804 [DEBUG]: Looking for jobs to run
+2023-03-17 15:56:23,806 [DEBUG]: Next wakeup is due at 2023-03-17 15:57:53.776782+03:00 (in 89.971269 seconds)
+2023-03-17 15:56:23,807 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:57:53 MSK)" (scheduled at 2023-03-17 15:56:23.776782+03:00)
+2023-03-17 15:56:23,808 [INFO]: N = 3
+2023-03-17 15:56:23,809 [DEBUG]: made response for ping
+2023-03-17 15:56:23,815 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:56:23,837 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:56:23,841 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:57:53 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:57:53,804 [DEBUG]: Looking for jobs to run
+2023-03-17 15:57:53,807 [DEBUG]: Next wakeup is due at 2023-03-17 15:59:23.776782+03:00 (in 89.970986 seconds)
+2023-03-17 15:57:53,808 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:59:23 MSK)" (scheduled at 2023-03-17 15:57:53.776782+03:00)
+2023-03-17 15:57:53,809 [INFO]: N = 3
+2023-03-17 15:57:53,810 [DEBUG]: made response for ping
+2023-03-17 15:57:53,817 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:57:53,840 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:57:53,844 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 15:59:23 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 15:58:42,135 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-17 15:58:42,137 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-17 15:58:42,137 [INFO]: Scheduler started
+2023-03-17 15:58:42,137 [DEBUG]: Looking for jobs to run
+2023-03-17 15:58:42,138 [DEBUG]: Next wakeup is due at 2023-03-17 16:00:12.135656+03:00 (in 89.997622 seconds)
+2023-03-17 15:58:54,427 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:58:54,431 [DEBUG]: http://localhost:5000 "GET /api/users HTTP/1.1" 200 13
+2023-03-17 15:58:54,432 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:58:54,435 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:58:54,886 [ERROR]: Exception on /favicon.ico [GET]
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_login/utils.py", line 285, in decorated_view
+    return current_app.login_manager.unauthorized()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_login/login_manager.py", line 178, in unauthorized
+    abort(401)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/helpers.py", line 310, in abort
+    current_app.aborter(code, *args, **kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/werkzeug/exceptions.py", line 864, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.Unauthorized: 401 Unauthorized: The server could not verify that you are authorized to access the URL requested. You either supplied the wrong credentials (e.g. a bad password), or your browser doesn't understand how to supply the credentials required.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 2528, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_restful/__init__.py", line 271, in error_router
+    return original_handler(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1669, in handle_user_exception
+    return self.handle_http_exception(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1609, in handle_http_exception
+    return self.ensure_sync(handler)(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 46, in log_redirect
+    print(error)
+OSError: [Errno 5] Input/output error
+2023-03-17 15:59:23,814 [DEBUG]: Looking for jobs to run
+2023-03-17 15:59:23,814 [DEBUG]: Next wakeup is due at 2023-03-17 16:00:53.776782+03:00 (in 89.962246 seconds)
+2023-03-17 15:59:23,815 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:00:53 MSK)" (scheduled at 2023-03-17 15:59:23.776782+03:00)
+2023-03-17 15:59:23,815 [INFO]: N = 3
+2023-03-17 15:59:23,815 [DEBUG]: made response for ping
+2023-03-17 15:59:23,817 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 15:59:23,825 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 15:59:23,826 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:00:53 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 421, in ping_websites
+    print(f'{result=}')
+OSError: [Errno 5] Input/output error
+2023-03-17 16:11:54,921 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-17 16:11:54,922 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-17 16:11:54,922 [INFO]: Scheduler started
+2023-03-17 16:11:54,923 [DEBUG]: Looking for jobs to run
+2023-03-17 16:11:54,923 [DEBUG]: Next wakeup is due at 2023-03-17 16:13:24.921672+03:00 (in 89.998187 seconds)
+2023-03-17 16:13:25,004 [DEBUG]: Looking for jobs to run
+2023-03-17 16:13:25,005 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:13:24 MSK)" (scheduled at 2023-03-17 16:13:24.921672+03:00)
+2023-03-17 16:13:25,006 [INFO]: N = 1
+2023-03-17 16:13:25,006 [DEBUG]: made response for ping
+2023-03-17 16:13:25,009 [DEBUG]: Next wakeup is due at 2023-03-17 16:14:54.921672+03:00 (in 89.916775 seconds)
+2023-03-17 16:13:25,009 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:13:25,024 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 16:13:25,025 [DEBUG]: []
+2023-03-17 16:13:25,026 [INFO]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:14:54 MSK)" executed successfully
+2023-03-17 16:14:54,971 [DEBUG]: Looking for jobs to run
+2023-03-17 16:14:54,972 [DEBUG]: Next wakeup is due at 2023-03-17 16:16:24.921672+03:00 (in 89.949424 seconds)
+2023-03-17 16:14:54,973 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:16:24 MSK)" (scheduled at 2023-03-17 16:14:54.921672+03:00)
+2023-03-17 16:14:54,973 [INFO]: N = 2
+2023-03-17 16:14:54,973 [DEBUG]: made response for ping
+2023-03-17 16:14:54,976 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:14:54,980 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 16:14:54,981 [DEBUG]: []
+2023-03-17 16:14:54,981 [INFO]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:16:24 MSK)" executed successfully
+2023-03-17 16:16:25,015 [DEBUG]: Looking for jobs to run
+2023-03-17 16:16:25,018 [DEBUG]: Next wakeup is due at 2023-03-17 16:17:54.921672+03:00 (in 89.905213 seconds)
+2023-03-17 16:16:25,019 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:17:54 MSK)" (scheduled at 2023-03-17 16:16:24.921672+03:00)
+2023-03-17 16:16:25,021 [INFO]: N = 3
+2023-03-17 16:16:25,021 [DEBUG]: made response for ping
+2023-03-17 16:16:25,031 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:16:25,052 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 16:16:25,056 [DEBUG]: []
+2023-03-17 16:16:25,057 [INFO]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:17:54 MSK)" executed successfully
+2023-03-17 16:17:45,514 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-17 16:17:45,515 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-17 16:17:45,515 [INFO]: Scheduler started
+2023-03-17 16:17:45,516 [DEBUG]: Looking for jobs to run
+2023-03-17 16:17:45,516 [DEBUG]: Next wakeup is due at 2023-03-17 16:19:15.514032+03:00 (in 89.997610 seconds)
+2023-03-17 16:17:54,968 [DEBUG]: Looking for jobs to run
+2023-03-17 16:17:54,969 [DEBUG]: Next wakeup is due at 2023-03-17 16:19:24.921672+03:00 (in 89.953086 seconds)
+2023-03-17 16:17:54,969 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:19:24 MSK)" (scheduled at 2023-03-17 16:17:54.921672+03:00)
+2023-03-17 16:17:54,969 [INFO]: N = 4
+2023-03-17 16:17:54,969 [DEBUG]: made response for ping
+2023-03-17 16:17:54,972 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:17:54,978 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 16:17:54,979 [DEBUG]: []
+2023-03-17 16:17:54,979 [INFO]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:19:24 MSK)" executed successfully
+2023-03-17 16:19:25,015 [DEBUG]: Looking for jobs to run
+2023-03-17 16:19:25,016 [DEBUG]: Next wakeup is due at 2023-03-17 16:20:54.921672+03:00 (in 89.905983 seconds)
+2023-03-17 16:19:25,016 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:20:54 MSK)" (scheduled at 2023-03-17 16:19:24.921672+03:00)
+2023-03-17 16:19:25,016 [INFO]: N = 5
+2023-03-17 16:19:25,017 [DEBUG]: made response for ping
+2023-03-17 16:19:25,019 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:19:25,025 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 16:19:25,026 [DEBUG]: []
+2023-03-17 16:19:25,026 [DEBUG]: Entered (N := N + 1) % 5 == 0
+2023-03-17 16:19:25,028 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:19:25,034 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 16:19:25,036 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:19:25,039 [DEBUG]: http://localhost:5000 "GET /api/users HTTP/1.1" 200 13
+2023-03-17 16:19:25,039 [INFO]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:20:54 MSK)" executed successfully
+2023-03-17 16:19:42,373 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:19:42,386 [DEBUG]: http://localhost:5000 "GET /api/users HTTP/1.1" 200 13
+2023-03-17 16:19:42,388 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:19:42,394 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 13
+2023-03-17 16:19:42,814 [ERROR]: Exception on /favicon.ico [GET]
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_login/utils.py", line 285, in decorated_view
+    return current_app.login_manager.unauthorized()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_login/login_manager.py", line 178, in unauthorized
+    abort(401)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/helpers.py", line 310, in abort
+    current_app.aborter(code, *args, **kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/werkzeug/exceptions.py", line 864, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.Unauthorized: 401 Unauthorized: The server could not verify that you are authorized to access the URL requested. You either supplied the wrong credentials (e.g. a bad password), or your browser doesn't understand how to supply the credentials required.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 2528, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask_restful/__init__.py", line 271, in error_router
+    return original_handler(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1669, in handle_user_exception
+    return self.handle_http_exception(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/flask/app.py", line 1609, in handle_http_exception
+    return self.ensure_sync(handler)(e)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 46, in log_redirect
+    """Handler for 401 and auto redirect to Login page"""
+OSError: [Errno 5] Input/output error
+2023-03-17 16:22:01,444 [INFO]: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-03-17 16:22:01,445 [INFO]: Added job "ping_websites" to job store "default"
+2023-03-17 16:22:01,445 [INFO]: Scheduler started
+2023-03-17 16:22:01,446 [DEBUG]: Looking for jobs to run
+2023-03-17 16:22:01,446 [DEBUG]: Next wakeup is due at 2023-03-17 16:23:31.443855+03:00 (in 89.997299 seconds)
+2023-03-17 16:23:31,508 [DEBUG]: Looking for jobs to run
+2023-03-17 16:23:31,515 [INFO]: Running job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:23:31 MSK)" (scheduled at 2023-03-17 16:23:31.443855+03:00)
+2023-03-17 16:23:31,516 [INFO]: N = 1
+2023-03-17 16:23:31,517 [DEBUG]: made response for ping
+2023-03-17 16:23:31,528 [DEBUG]: Next wakeup is due at 2023-03-17 16:25:01.443855+03:00 (in 89.930157 seconds)
+2023-03-17 16:23:31,536 [DEBUG]: Starting new HTTP connection (1): localhost:5000
+2023-03-17 16:23:31,616 [DEBUG]: http://localhost:5000 "GET /api/sites HTTP/1.1" 200 907
+2023-03-17 16:23:31,716 [ERROR]: Job "ping_websites (trigger: interval[0:01:30], next run at: 2023-03-17 16:25:01 MSK)" raised an exception
+Traceback (most recent call last):
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/apscheduler/executors/base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 420, in ping_websites
+    result = [ping_website(item) for item in websites]
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/main.py", line 420, in <listcomp>
+    result = [ping_website(item) for item in websites]
+  File "/home/alexa/Desktop/PotatoChecker-master/WebApp/scripts/availability_checker.py", line 7, in ping_website
+    response = ping(url, size=16, count=count, timeout=timeout)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/pythonping/__init__.py", line 81, in ping
+    comm = executor.Communicator(target, provider, timeout, interval, socket_options=options, verbose=verbose, output=out,
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/pythonping/executor.py", line 293, in __init__
+    self.socket = network.Socket(target, 'icmp', options=socket_options, source=source)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/pythonping/network.py", line 31, in __init__
+    self.socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, self.protocol)
+  File "/home/alexa/Desktop/PotatoChecker-master/venv/lib/python3.10/site-packages/gevent/_socket3.py", line 133, in __init__
+    self._sock = self._gevent_sock_class(family, type, proto, fileno)
+PermissionError: [Errno 1] Operation not permitted

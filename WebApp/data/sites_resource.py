@@ -1,8 +1,8 @@
-from flask_restful import Resource, reqparse, abort
 from flask import jsonify, Response
-from data import db_session
-from data.sites import Sites
-from sqlalchemy import func
+from flask_restful import Resource, reqparse, abort
+
+import db_session
+from sites import Sites
 
 
 class SitesResource(Resource):

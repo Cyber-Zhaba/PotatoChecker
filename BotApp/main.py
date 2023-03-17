@@ -1,30 +1,13 @@
-import logging
 import asyncio
+import logging
 
 import requests
 from aiogram import Dispatcher
-
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import BotCommand
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from commands.structures.states import LoginForm
-from commands.bot_commands import bot_commands
-from commands.about import about_command
-from commands.help import help_command
-from commands.start import start_command
-from commands.login import (
-    login_command,
-    logout_command,
-    get_user_login,
-    get_user_password
-)
-
-from commands.menu_commands import menu_command_renamed
-from commands.menu_commands import call_get_report
-from commands.menu_commands import call_back
-from commands.menu_commands import call_notifications_on
-from bot.config import bot
+from modules.__init__ import *
 
 
 def register_all_handlers(dp):
@@ -62,20 +45,20 @@ async def main():
         await bot.session.close()
 
 
-def noticed():
-    responce = requests.get('http://localhost:5000/api/telegram',
+async def noticed():
+    response = requests.get('http://localhost:5000/api/telegram',
                             json={'type': 'get_data_for_notified_users'}).json()
-    for user in responce.keys():
-        if responce[user]['changed_sites']:
-            websites = responce[user]['changed_sites']
+    for user in response.keys():
+        if response[user]['changed_sites']:
+            websites = response[user]['changed_sites']
             id_telegram = int(user)
-            bot.send_message(id_telegram, ' '.join(websites))
+            websites_str = '\n'.join([f'{x[0]} {x[1]}' for x in websites])
+            await bot.send_message(id_telegram, f"Отчёт по сайтам:\n{websites_str}")
 
 
 if __name__ == '__main__':
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(noticed, "interval", seconds=30)
+    scheduler.add_job(noticed, "interval", seconds=300)
     scheduler.start()
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
-
