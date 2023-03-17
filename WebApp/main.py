@@ -221,11 +221,10 @@ def draw_graphic(website_id):
     logging.info(f'{time=}')
 
     name = get(f'http://localhost:5000/api/sites/{website_id}').json()['sites']['name']
-    fig, axes = plt.subplots(facecolor='#21024c')
+    fig, axes = plt.subplots()
 
     axes.set_title(name.upper(), color='white', size='20')
 
-    axes.set_facecolor(color='#21024c')
     axes.tick_params(axis='both', colors='white')
 
     axes.set_xlabel('Часы', color='white', size='13')
@@ -247,7 +246,7 @@ def draw_graphic(website_id):
 
     plt.gcf().autofmt_xdate()
     png_path = ('WebApp' if getcwd().split('\\')[-1] != 'WebApp' else '') + f'/static/img/{current_user.name}.png'
-    fig.savefig(png_path, dpi=200)
+    fig.savefig(png_path, dpi=200, transparent=True)
     return redirect(f'/personal_account/{name}')
 
 
