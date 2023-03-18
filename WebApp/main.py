@@ -16,12 +16,11 @@ from gevent.pywsgi import WSGIServer
 from requests import get, post, delete, put
 
 from data.__init__ import *
+from scripts.__init__ import *
 from forms.add_website_forms import AddWebsiteForm
 from forms.comment_form import CommentForm
 from forms.registration_forms import RegisterForm, LoginForm
 from forms.util_forms import NameWebSiteForm
-from scripts.availability_checker import ping_website
-from scripts.utilities import status
 
 monkey.patch_all()
 UPLOAD_FOLDER = '/static/img'
@@ -240,7 +239,7 @@ def draw_graphic(website_id):
 
     axes.plot(time, reports, color='#0f497f')
 
-    plt.ylim([0, 100])
+    # plt.ylim([0, 100])
 
     plt.gcf().autofmt_xdate()
     png_path = ('WebApp' if getcwd().split('\\')[-1] != 'WebApp' else '') + f'/static/img/{current_user.name}.png'
@@ -423,7 +422,7 @@ def ping_websites():
         put(f'http://localhost:5000/api/sites/{res[0]}',
             json={'type': 'update_ping', 'ping': res[1], 'state': status(res[1])},
             timeout=(2, 20))
-    # send_email(result)
+    send_email(result)
 
     if (N := N + 1) % 5 == 0:
         logging.debug('Entered (N := N + 1) % 5 == 0')
